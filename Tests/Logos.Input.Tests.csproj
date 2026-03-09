@@ -21,4 +21,8 @@
         <Using Include="NUnit.Framework"/>
     </ItemGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\Source\Logos.Input.csproj" />
+    </ItemGroup>
+
 </Project>
