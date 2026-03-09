@@ -1,4 +1,7 @@
-﻿namespace Logos.Input
+﻿using System;
+using System.Collections.Generic;
+
+namespace Logos.Input
 {
     /// <summary>
     /// Defines methods that access connected input devices and trigger events related to them.
