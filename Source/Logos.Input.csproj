@@ -8,4 +8,10 @@
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     </PropertyGroup>
 
+    <ItemGroup>
+        <None Include="..\Libraries\win-x64\*.dll"
+              Condition="$([MSBuild]::IsOSPlatform('Windows')) And $([System.Runtime.InteropServices.RuntimeInformation]::OSArchitecture) == x64"
+              CopyToOutputDirectory="PreserveNewest"/>
+    </ItemGroup>
+
 </Project>
