@@ -15,5 +15,11 @@ namespace Logos.Input.Sdl3
         [LibraryImport(LibraryName)]
         [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
         public static partial void SDL_Quit();
+
+        [LibraryImport(LibraryName)]
+        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+        [return: MarshalAs(UnmanagedType.U1)]
+        public static partial bool SDL_PollEvents(out SDL_Event e);
+
     }
 }
