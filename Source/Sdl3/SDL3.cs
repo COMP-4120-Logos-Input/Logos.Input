@@ -1,10 +1,17 @@
-﻿using System.Runtime.CompilerServices;
+﻿using System;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 namespace Logos.Input.Sdl3
 {
     internal static partial class SDL3
     {
+        static SDL3()
+        {
+            // Quits SDL when the parent process is about to die.
+            AppDomain.CurrentDomain.ProcessExit +=  (_, _) => SDL_Quit();
+        }
+
         [LibraryImport(nameof(SDL3))]
         [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
         [return: MarshalAs(UnmanagedType.U1)]
