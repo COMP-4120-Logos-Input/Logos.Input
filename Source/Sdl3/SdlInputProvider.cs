@@ -9,7 +9,7 @@ namespace Logos.Input.Sdl3
     {
         static SdlInputProvider()
         {
-            bool success = SDL_Init(SDL_InitFlags.SDL_INIT_EVENTS);
+            bool success = SDL_Init(SDL_InitFlags.SDL_INIT_GAMEPAD);
             Debug.Assert(success, "SDL3 somehow failed upon initialization.");
         }
 
