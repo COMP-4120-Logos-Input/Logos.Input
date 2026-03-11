@@ -19,11 +19,11 @@ namespace Logos.Input.Sdl3
             get => Enumerable.Empty<IInputDevice>();
         }
 
-        public event EventHandler<IInputDevice>? InputDeviceAdded;
+        public event EventHandler<InputEventArgs>? InputDeviceAdded;
 
-        public event EventHandler<IInputDevice>? InputDeviceRemoved;
+        public event EventHandler<InputEventArgs>? InputDeviceRemoved;
 
-        public event EventHandler<IInputDevice>? InputDeviceUpdated;
+        public event EventHandler<InputEventArgs>? InputDeviceUpdated;
 
         public void Update()
         {
