@@ -2,13 +2,13 @@
 {
     public readonly record struct InputEventArgs
     {
-        public InputEventArgs(IInputDevice source, long timestamp)
+        public InputEventArgs(IInputDevice device, long timestamp)
         {
-            Source = source;
+            Device = device;
             Timestamp = timestamp;
         }
 
-        public IInputDevice Source { get; }
+        public IInputDevice Device { get; }
 
         public long Timestamp { get; }
     }
