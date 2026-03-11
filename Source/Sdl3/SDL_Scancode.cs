@@ -1,6 +1,6 @@
 namespace Logos.Input.Sdl3
 {
-    internal enum SDL_Scancode
+    internal enum SDL_Scancode : uint
     {
         SDL_SCANCODE_UNKNOWN = 0,
         SDL_SCANCODE_A = 4,
