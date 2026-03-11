@@ -25,5 +25,10 @@ namespace Logos.Input.Sdl3
         [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
         [return: MarshalAs(UnmanagedType.U1)]
         public static partial bool SDL_PollEvent(out SDL_Event e);
+
+        [LibraryImport(nameof(SDL3))]
+        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+        [return: MarshalAs(UnmanagedType.U1)]
+        public static partial bool SDL_PushEvent(ref SDL_Event e);
     }
 }
