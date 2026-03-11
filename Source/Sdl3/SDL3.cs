@@ -18,10 +18,5 @@ namespace Logos.Input.Sdl3
         [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
         [return: MarshalAs(UnmanagedType.U1)]
         public static partial bool SDL_PollEvent(out SDL_Event e);
-
-        public static SDL_Keycode SDL_SCANCODE_TO_KEYCODE(SDL_Scancode x)
-        {
-            return (SDL_Keycode)((uint)x | (uint)SDL_Keycode.SDLK_SCANCODE_MASK);
-        }
     }
 }
