@@ -14,7 +14,7 @@ namespace Logos.Input.Sdl3
             SDL3.SDL_Quit();;
         }
 
-        public IEnumerable<IInputDevice> InputDevices
+        public IEnumerable<IInputDevice> ConnectedDevices
         {
             get => Enumerable.Empty<IInputDevice>();
         }

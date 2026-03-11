@@ -9,7 +9,7 @@ namespace Logos.Input.Tests
         public static void ConstructorTest()
         {
             SdlInputProvider provider = new SdlInputProvider();
-            Assert.That(provider.InputDevices, Is.Empty);
+            Assert.That(provider.ConnectedDevices, Is.Empty);
         }
     }
 }

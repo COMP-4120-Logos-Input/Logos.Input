@@ -14,7 +14,7 @@ namespace Logos.Input
         /// <returns>
         /// A collection of connected input devices.
         /// </returns>
-        IEnumerable<IInputDevice> InputDevices { get; }
+        IEnumerable<IInputDevice> ConnectedDevices { get; }
 
         /// <summary>
         /// Occurs when a new input device is connected.
