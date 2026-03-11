@@ -19,17 +19,17 @@ namespace Logos.Input
         /// <summary>
         /// Occurs when a new input device is connected.
         /// </summary>
-        event EventHandler<InputEventArgs> InputDeviceConnected;
+        event EventHandler<InputEventArgs> DeviceConnected;
 
         /// <summary>
         /// Occurs when an input device is disconnected.
         /// </summary>
-        event EventHandler<InputEventArgs> InputDeviceDisconnected;
+        event EventHandler<InputEventArgs> DeviceDisconnected;
 
         /// <summary>
         /// Occurs when the state of an input device is updated.
         /// </summary>
-        event EventHandler<InputEventArgs> InputDeviceUpdated;
+        event EventHandler<InputEventArgs> DeviceUpdated;
 
         /// <summary>
         /// Reads input from connected input devices and triggers events related to them.

@@ -11,7 +11,7 @@ namespace Logos.Input.Sdl3
         {
             bool success = SDL3.SDL_InitSubSystem(0x4000);
             Debug.Assert(success, "SDL3 somehow failed upon initialization.");
-            SDL3.SDL_Quit();;
+            SDL3.SDL_Quit();
         }
 
         public IEnumerable<IInputDevice> ConnectedDevices
@@ -19,11 +19,11 @@ namespace Logos.Input.Sdl3
             get => Enumerable.Empty<IInputDevice>();
         }
 
-        public event EventHandler<InputEventArgs>? InputDeviceConnected;
+        public event EventHandler<InputEventArgs>? DeviceConnected;
 
-        public event EventHandler<InputEventArgs>? InputDeviceDisconnected;
+        public event EventHandler<InputEventArgs>? DeviceDisconnected;
 
-        public event EventHandler<InputEventArgs>? InputDeviceUpdated;
+        public event EventHandler<InputEventArgs>? DeviceUpdated;
 
         public void Update()
         {
