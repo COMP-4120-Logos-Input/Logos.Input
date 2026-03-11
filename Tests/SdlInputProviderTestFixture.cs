@@ -11,5 +11,19 @@ namespace Logos.Input.Tests
             SdlInputProvider provider = new SdlInputProvider();
             Assert.That(provider.ConnectedDevices, Is.Empty);
         }
+
+        [Test]
+        public static void DeviceConnectedTest()
+        {
+            SdlInputProvider provider = new SdlInputProvider();
+            EventQueueMarshal.PushKeyboardConnectedEvent(uint.MaxValue);
+            provider.DeviceConnected += (_, args) =>
+            {
+                Assert.That(provider.ConnectedDevices, Has.Member(args.Device));
+                Assert.Pass();
+            };
+            provider.Update();
+            Assert.Fail();
+        }
     }
 }
