@@ -9,9 +9,9 @@ namespace Logos.Input.Sdl3
     {
         public SdlInputProvider()
         {
-            bool success = Sdl.SDL_InitSubSystem(0x4000);
+            bool success = SDL3.SDL_InitSubSystem(0x4000);
             Debug.Assert(success, "SDL3 somehow failed upon initialization.");
-            Sdl.SDL_Quit();;
+            SDL3.SDL_Quit();;
         }
 
         public IEnumerable<IInputDevice> InputDevices
