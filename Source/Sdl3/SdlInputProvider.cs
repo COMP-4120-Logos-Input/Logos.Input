@@ -9,7 +9,7 @@ namespace Logos.Input.Sdl3
     {
         static SdlInputProvider()
         {
-            bool success = SDL_Init(0x4000);
+            bool success = SDL_Init(SDL_InitFlags.SDL_INIT_EVENTS);
             Debug.Assert(success, "SDL3 somehow failed upon initialization.");
         }
 
@@ -50,6 +50,7 @@ namespace Logos.Input.Sdl3
                     {
                         if (_keyboards.Remove(e.kdevice.which, out KeyboardDevice? keyboard))
                         {
+                            keyboard.IsConnected = false;
                             DeviceDisconnected?.Invoke(this, new InputEventArgs(keyboard, timestamp));
                         }
 
@@ -75,6 +76,8 @@ namespace Logos.Input.Sdl3
 
                         continue;
                     }
+                    default:
+                        continue;
                 }
             }
         }
