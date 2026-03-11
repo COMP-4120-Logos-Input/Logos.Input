@@ -8,7 +8,7 @@ namespace Logos.Input.Sdl3
         [LibraryImport(nameof(SDL3))]
         [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
         [return: MarshalAs(UnmanagedType.U1)]
-        public static partial bool SDL_InitSubSystem(uint flags);
+        public static partial bool SDL_Init(uint flags);
 
         [LibraryImport(nameof(SDL3))]
         [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
