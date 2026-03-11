@@ -14,12 +14,12 @@ namespace Logos.Input.Sdl3
 
         [LibraryImport(nameof(SDL3))]
         [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-        [return: MarshalAs(UnmanagedType.U1)]
-        public static partial bool SDL_Init(uint flags);
+        private static partial void SDL_Quit();
 
         [LibraryImport(nameof(SDL3))]
         [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-        public static partial void SDL_Quit();
+        [return: MarshalAs(UnmanagedType.U1)]
+        public static partial bool SDL_Init(uint flags);
 
         [LibraryImport(nameof(SDL3))]
         [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
