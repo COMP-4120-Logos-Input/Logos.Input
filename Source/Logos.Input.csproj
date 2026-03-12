@@ -12,12 +12,8 @@
         <None Include="..\Libraries\win-x64\*.dll"
               Condition="$([MSBuild]::IsOSPlatform('Windows')) And $([System.Runtime.InteropServices.RuntimeInformation]::OSArchitecture) == x64"
               CopyToOutputDirectory="PreserveNewest"/>
-    </ItemGroup>
-
-    <ItemGroup>
         <None Include="..\Libraries\osx-arm64\libSDL3.dylib"
               Condition="$([MSBuild]::IsOSPlatform('OSX')) And $([System.Runtime.InteropServices.RuntimeInformation]::OSArchitecture) == Arm64"
-              Link="libSDL3.dylib"
               CopyToOutputDirectory="PreserveNewest"/>
     </ItemGroup>
 
