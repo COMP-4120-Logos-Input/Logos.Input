@@ -86,22 +86,31 @@ namespace Logos.Input.Sdl3
         {
             public bool IsConnected { get; set; } = true;
 
+            private HashSet<KeyCode> _pressedKeys = new();
+            
+            public HashSet<KeyCode> PressedKeys
+            {
+                get { return _pressedKeys; }
+            }
+
             public event EventHandler<KeyboardEventArgs>? KeyPressed;
 
             public event EventHandler<KeyboardEventArgs>? KeyReleased;
 
             public bool IsKeyDown(KeyCode key)
             {
-                return false;
+                return _pressedKeys.Contains(key);
             }
 
             public void OnKeyPressed(KeyboardEventArgs args)
             {
+                _pressedKeys.Add(args.Key);
                 KeyPressed?.Invoke(this, args);
             }
 
             public void OnKeyReleased(KeyboardEventArgs args)
             {
+                _pressedKeys.Remove(args.Key);
                 KeyReleased?.Invoke(this, args);
             }
         }
