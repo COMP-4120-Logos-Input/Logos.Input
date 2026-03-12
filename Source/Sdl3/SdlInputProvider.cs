@@ -97,7 +97,7 @@ namespace Logos.Input.Sdl3
 
             public event EventHandler<KeyboardEventArgs>? KeyReleased;
 
-            public bool IsKeyDown(KeyCode key)
+            public bool IsKeyPressed(KeyCode key)
             {
                 return _pressedKeys.Contains(key);
             }

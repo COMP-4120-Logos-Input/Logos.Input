@@ -11,6 +11,6 @@ namespace Logos.Input
 
         event EventHandler<KeyboardEventArgs> KeyReleased;
 
-        bool IsKeyDown(KeyCode key);
+        bool IsKeyPressed(KeyCode key);
     }
 }
