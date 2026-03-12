@@ -1,5 +1,8 @@
-﻿namespace Logos.Input.Sdl3
+﻿using System;
+
+namespace Logos.Input.Sdl3
 {
+    [Flags]
     internal enum SDL_InitFlags : uint
     {
         SDL_INIT_AUDIO = 0x00000010,

@@ -5,18 +5,50 @@ using static Logos.Input.Sdl3.SDL3;
 
 namespace Logos.Input.Sdl3
 {
+    internal interface ISdlRuntime
+    {
+        void Initialize();
+
+        bool PollEvent(out SDL_Event e);
+    }
+
     public sealed class SdlInputProvider : IInputProvider
     {
-        static SdlInputProvider()
+        private const SDL_InitFlags InitFlags = SDL_InitFlags.SDL_INIT_EVENTS | SDL_InitFlags.SDL_INIT_GAMEPAD;
+
+        private sealed class NativeSdlRuntime : ISdlRuntime
         {
-            bool success = SDL_Init(SDL_InitFlags.SDL_INIT_GAMEPAD);
-            Debug.Assert(success, "SDL3 somehow failed upon initialization.");
+            private static readonly Lazy<bool> s_isInitialized = new(() => SDL_Init(InitFlags));
+
+            public static NativeSdlRuntime Instance { get; } = new();
+
+            private NativeSdlRuntime()
+            {
+            }
+
+            public void Initialize()
+            {
+                Debug.Assert(s_isInitialized.Value, "SDL3 somehow failed upon initialization.");
+            }
+
+            public bool PollEvent(out SDL_Event e)
+            {
+                return SDL_PollEvent(out e);
+            }
         }
 
         private readonly Dictionary<uint, KeyboardDevice> _keyboards;
+        private readonly ISdlRuntime _runtime;
 
         public SdlInputProvider()
+            : this(NativeSdlRuntime.Instance)
         {
+        }
+
+        internal SdlInputProvider(ISdlRuntime runtime)
+        {
+            _runtime = runtime ?? throw new ArgumentNullException(nameof(runtime));
+            _runtime.Initialize();
             _keyboards = new Dictionary<uint, KeyboardDevice>();
         }
 
@@ -33,7 +65,7 @@ namespace Logos.Input.Sdl3
 
         public void Update()
         {
-            while (SDL_PollEvent(out SDL_Event e))
+            while (_runtime.PollEvent(out SDL_Event e))
             {
                 long timestamp = (long)(e.common.timestamp / TimeSpan.NanosecondsPerTick);
 
