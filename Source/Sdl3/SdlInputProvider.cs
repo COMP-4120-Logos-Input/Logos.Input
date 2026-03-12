@@ -1,54 +1,24 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using static Logos.Input.Sdl3.SDL3;
 
 namespace Logos.Input.Sdl3
 {
-    internal interface ISdlRuntime
-    {
-        void Initialize();
-
-        bool PollEvent(out SDL_Event e);
-    }
-
     public sealed class SdlInputProvider : IInputProvider
     {
-        private const SDL_InitFlags InitFlags = SDL_InitFlags.SDL_INIT_EVENTS | SDL_InitFlags.SDL_INIT_GAMEPAD;
+        private readonly Dictionary<uint, KeyboardDevice> _keyboards;
 
-        private sealed class NativeSdlRuntime : ISdlRuntime
+        static SdlInputProvider()
         {
-            private static readonly Lazy<bool> s_isInitialized = new(() => SDL_Init(InitFlags));
-
-            public static NativeSdlRuntime Instance { get; } = new();
-
-            private NativeSdlRuntime()
+            if (!SDL_Init(SDL_InitFlags.SDL_INIT_GAMEPAD))
             {
-            }
-
-            public void Initialize()
-            {
-                Debug.Assert(s_isInitialized.Value, "SDL3 somehow failed upon initialization.");
-            }
-
-            public bool PollEvent(out SDL_Event e)
-            {
-                return SDL_PollEvent(out e);
+                // It is considered a catastrophic failure if SDL cannot initialize input events.
+                throw new Exception("SDL3 somehow failed upon initialization.");
             }
         }
-
-        private readonly Dictionary<uint, KeyboardDevice> _keyboards;
-        private readonly ISdlRuntime _runtime;
 
         public SdlInputProvider()
-            : this(NativeSdlRuntime.Instance)
         {
-        }
-
-        internal SdlInputProvider(ISdlRuntime runtime)
-        {
-            _runtime = runtime ?? throw new ArgumentNullException(nameof(runtime));
-            _runtime.Initialize();
             _keyboards = new Dictionary<uint, KeyboardDevice>();
         }
 
@@ -65,7 +35,7 @@ namespace Logos.Input.Sdl3
 
         public void Update()
         {
-            while (_runtime.PollEvent(out SDL_Event e))
+            while (SDL_PollEvent(out SDL_Event e))
             {
                 long timestamp = (long)(e.common.timestamp / TimeSpan.NanosecondsPerTick);
 
