@@ -5,7 +5,8 @@ namespace Logos.Input
 {
     public interface IKeyboardDevice : IInputDevice
     {
-        public HashSet<KeyCode> PressedKeys { get; }
+        IEnumerable<KeyCode> PressedKeys { get; }
+
         event EventHandler<KeyboardEventArgs> KeyPressed;
 
         event EventHandler<KeyboardEventArgs> KeyReleased;

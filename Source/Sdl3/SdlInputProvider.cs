@@ -84,13 +84,13 @@ namespace Logos.Input.Sdl3
 
         private sealed class KeyboardDevice : IKeyboardDevice
         {
+            private HashSet<KeyCode> _pressedKeys = new HashSet<KeyCode>();
+
             public bool IsConnected { get; set; } = true;
 
-            private HashSet<KeyCode> _pressedKeys = new();
-            
-            public HashSet<KeyCode> PressedKeys
+            public IEnumerable<KeyCode> PressedKeys
             {
-                get { return _pressedKeys; }
+                get => _pressedKeys;
             }
 
             public event EventHandler<KeyboardEventArgs>? KeyPressed;
@@ -104,14 +104,18 @@ namespace Logos.Input.Sdl3
 
             public void OnKeyPressed(KeyboardEventArgs args)
             {
-                _pressedKeys.Add(args.Key);
-                KeyPressed?.Invoke(this, args);
+                if (_pressedKeys.Add(args.Key))
+                {
+                    KeyPressed?.Invoke(this, args);
+                }
             }
 
             public void OnKeyReleased(KeyboardEventArgs args)
             {
-                _pressedKeys.Remove(args.Key);
-                KeyReleased?.Invoke(this, args);
+                if (_pressedKeys.Remove(args.Key))
+                {
+                    KeyReleased?.Invoke(this, args);
+                }
             }
         }
     }
