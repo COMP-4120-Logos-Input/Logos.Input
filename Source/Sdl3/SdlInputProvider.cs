@@ -106,18 +106,14 @@ namespace Logos.Input.Sdl3
 
             public void OnKeyPressed(KeyboardEventArgs args)
             {
-                if (_pressedKeys.Add(args.Key))
-                {
-                    KeyPressed?.Invoke(this, args);
-                }
+                _pressedKeys.Add(args.Key);
+                KeyPressed?.Invoke(this, args);
             }
 
             public void OnKeyReleased(KeyboardEventArgs args)
             {
-                if (_pressedKeys.Remove(args.Key))
-                {
-                    KeyReleased?.Invoke(this, args);
-                }
+                _pressedKeys.Remove(args.Key);
+                KeyReleased?.Invoke(this, args);
             }
         }
     }
