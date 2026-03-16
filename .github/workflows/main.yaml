@@ -1,4 +1,4 @@
-name: build and test
+name: CI
 
 on:
   push:
@@ -9,7 +9,7 @@ on:
     - '**.csproj'
 
 env:
-  DOTNET_VERSION: '10.0'
+  DOTNET_VERSION: '10.0.103'
 
 jobs:
   build-and-test:
