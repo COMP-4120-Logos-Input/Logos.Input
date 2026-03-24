@@ -129,6 +129,9 @@ namespace Logos.Input.Sdl3
             {
                 get => _pressedButtons;
             }
+
+            private Vector2 _cursorPosition = new Vector2(0, 0);
+            private Vector2 _wheelRotation = new Vector2(0, 0);
             
             public Vector2 WheelRotation { get; }
             public event EventHandler<MouseButtonEventArgs>? ButtonPressed;
@@ -154,11 +157,13 @@ namespace Logos.Input.Sdl3
 
             public void OnWheelRolled(MouseWheelEventArgs args)
             {
+                _wheelRotation = args.Rotation;
                 WheelRolled?.Invoke(this, args);
             }
 
             public void OnCursorMoved(MouseCursorEventArgs args)
             {
+                _cursorPosition = args.Position;
                 CursorMoved?.Invoke(this, args);
             }
 
