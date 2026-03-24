@@ -9,6 +9,7 @@ namespace Logos.Input.Sdl3
     public sealed class SdlInputProvider : IInputProvider
     {
         private readonly Dictionary<uint, KeyboardDevice> _keyboards;
+        private readonly Dictionary<uint, MouseDevice> _mice;
 
         static SdlInputProvider()
         {
@@ -22,10 +23,12 @@ namespace Logos.Input.Sdl3
         public SdlInputProvider()
         {
             _keyboards = new Dictionary<uint, KeyboardDevice>();
+            _mice = new Dictionary<uint, MouseDevice>();
         }
 
         public IEnumerable<IInputDevice> ConnectedDevices
         {
+            // Should we also return mice here?
             get => _keyboards.Values;
         }
 
