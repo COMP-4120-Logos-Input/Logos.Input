@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Numerics;
 using static Logos.Input.Sdl3.SDL3;
 
 namespace Logos.Input.Sdl3
@@ -115,6 +116,23 @@ namespace Logos.Input.Sdl3
                 _pressedKeys.Remove(args.Key);
                 KeyReleased?.Invoke(this, args);
             }
+        }
+
+        private sealed class MouseDevice : IMouseDevice
+        {
+            public bool IsConnected { get; set; } = true;
+            
+            public Vector2 WheelRotation { get; set; }
+            public event EventHandler<MouseButtonEventArgs>? ButtonPressed;
+            public event EventHandler<MouseButtonEventArgs>? ButtonReleased;
+            public event EventHandler<MouseWheelEventArgs>? WheelRolled;
+            public event EventHandler<MouseCursorEventArgs>? CursorMoved;
+            public bool IsButtonPressed(MouseButton button)
+            {
+                throw new NotImplementedException();
+            }
+
+            Vector2 IMouseDevice.CursorPosition { get; }
         }
     }
 }
