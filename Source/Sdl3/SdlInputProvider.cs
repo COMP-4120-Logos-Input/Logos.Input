@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Numerics;
 using static Logos.Input.Sdl3.SDL3;
 
@@ -121,15 +122,44 @@ namespace Logos.Input.Sdl3
         private sealed class MouseDevice : IMouseDevice
         {
             public bool IsConnected { get; set; } = true;
+
+            private HashSet<MouseButton> _pressedButtons = new HashSet<MouseButton>();
+
+            public IEnumerable<MouseButton> PressedButtons
+            {
+                get => _pressedButtons;
+            }
             
-            public Vector2 WheelRotation { get; set; }
+            public Vector2 WheelRotation { get; }
             public event EventHandler<MouseButtonEventArgs>? ButtonPressed;
             public event EventHandler<MouseButtonEventArgs>? ButtonReleased;
             public event EventHandler<MouseWheelEventArgs>? WheelRolled;
             public event EventHandler<MouseCursorEventArgs>? CursorMoved;
             public bool IsButtonPressed(MouseButton button)
             {
-                throw new NotImplementedException();
+                return _pressedButtons.Contains(button);
+            }
+
+            public void OnButtonPressed(MouseButtonEventArgs args)
+            {
+                _pressedButtons.Add(args.Button);
+                ButtonPressed?.Invoke(this, args);
+            }
+
+            public void OnButtonReleased(MouseButtonEventArgs args)
+            {
+                _pressedButtons.Remove(args.Button);
+                ButtonReleased?.Invoke(this, args);
+            }
+
+            public void OnWheelRolled(MouseWheelEventArgs args)
+            {
+                WheelRolled?.Invoke(this, args);
+            }
+
+            public void OnCursorMoved(MouseCursorEventArgs args)
+            {
+                CursorMoved?.Invoke(this, args);
             }
 
             Vector2 IMouseDevice.CursorPosition { get; }
