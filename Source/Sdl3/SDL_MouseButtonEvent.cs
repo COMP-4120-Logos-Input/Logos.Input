@@ -12,7 +12,7 @@ namespace Logos.Input.Sdl3
         public UInt32 windowID;  // SDL_WindowID
         public UInt32 which;  // SDL_MouseID
         public byte button;
-        public bool down;
+        public byte down;
         public byte clicks;
         public byte padding;
         public float x;

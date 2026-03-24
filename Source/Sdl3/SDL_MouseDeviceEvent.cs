@@ -9,7 +9,7 @@ namespace Logos.Input.Sdl3
         public SDL_EventType type;
         public UInt32 reserved;
         public UInt64 timestamp;
-        private uint which;
+        public uint which;
     }
 }
 

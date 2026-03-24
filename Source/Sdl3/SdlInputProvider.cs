@@ -83,12 +83,90 @@ namespace Logos.Input.Sdl3
 
                         continue;
                     }
+                    case SDL_EventType.SDL_EVENT_MOUSE_ADDED:
+                    {
+                        MouseDevice mouse = new MouseDevice();
+                        _mice.Add(e.mdevice.which, mouse);
+                        DeviceConnected?.Invoke(this, new InputEventArgs(mouse, timestamp));
+                        continue;
+                    }
+                    case SDL_EventType.SDL_EVENT_MOUSE_REMOVED:
+                    {
+                        if (_mice.Remove(e.kdevice.which, out MouseDevice? mouse))
+                        {
+                            mouse.IsConnected = false;
+                            DeviceDisconnected?.Invoke(this, new InputEventArgs(mouse, timestamp));
+                        }
+                        continue;
+                    }
+                    case SDL_EventType.SDL_EVENT_MOUSE_BUTTON_DOWN:
+                    {
+                        if (_mice.TryGetValue(e.mdevice.which, out MouseDevice? mouse))
+                        {
+                            MouseButton button = SDLButtonToMouseButton(e.button.button);
+                            mouse.OnButtonReleased(new MouseButtonEventArgs(button, timestamp));
+                            DeviceUpdated?.Invoke(this, new InputEventArgs(mouse, timestamp));
+                        }
+                        continue;
+                    }
+                    case SDL_EventType.SDL_EVENT_MOUSE_BUTTON_UP:
+                    {
+                        if (_mice.TryGetValue(e.mdevice.which, out MouseDevice? mouse))
+                        {
+                            MouseButton button = SDLButtonToMouseButton(e.button.button);
+                            mouse.OnButtonReleased(new MouseButtonEventArgs(button, timestamp));
+                            DeviceUpdated?.Invoke(this, new InputEventArgs(mouse, timestamp));
+                        }
+                        continue;
+                    }
+                    case SDL_EventType.SDL_EVENT_MOUSE_MOTION:
+                    {
+                        if (_mice.TryGetValue(e.mdevice.which, out MouseDevice? mouse))
+                        {
+                            Vector2 pos = new Vector2(e.motion.x, e.motion.y);
+                            mouse.OnCursorMoved(new MouseCursorEventArgs(pos, timestamp));
+                            DeviceUpdated?.Invoke(this, new InputEventArgs(mouse, timestamp));
+                        }
+                        continue;
+                    }
+                    /* THis event below doesnt handle flipped wheels which is a property of SDL_MouseWheelEvent
+                        Although it should be trivial to handle it.
+                     */
+                    case SDL_EventType.SDL_EVENT_MOUSE_WHEEL:
+                    {
+                        if (_mice.TryGetValue(e.mdevice.which, out MouseDevice? mouse))
+                        {
+                            Vector2 rotation = new Vector2(e.wheel.x, e.wheel.y);
+                            mouse.OnWheelRolled(new MouseWheelEventArgs(rotation, timestamp));
+                            DeviceUpdated?.Invoke(this, new InputEventArgs(mouse, timestamp));
+                        }
+                        continue;
+                    }
                     default:
                         continue;
                 }
             }
         }
 
+        private static MouseButton SDLButtonToMouseButton(byte sdlButton)
+        {
+            switch (sdlButton)
+            {
+                case 1:
+                    return MouseButton.Left;
+                case 2:
+                    return MouseButton.Middle;
+                case 3:
+                    return MouseButton.Right;
+                case 4:
+                    return MouseButton.X1;
+                case 5:
+                    return MouseButton.X2;
+                default:
+                    return MouseButton.None;
+            }
+        }
+        
         private sealed class KeyboardDevice : IKeyboardDevice
         {
             private HashSet<KeyCode> _pressedKeys = new HashSet<KeyCode>();
