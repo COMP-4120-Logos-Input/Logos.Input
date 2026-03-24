@@ -19,5 +19,17 @@ namespace Logos.Input.Sdl3
 
         [FieldOffset(0)]
         public SDL_QuitEvent quit;
+
+        [FieldOffset(0)] 
+        public SDL_MouseDeviceEvent mdevice;
+        
+        [FieldOffset(0)]
+        public SDL_MouseMotionEvent motion;
+        
+        [FieldOffset(0)]
+        public SDL_MouseButtonEvent button;
+        
+        [FieldOffset(0)]
+        public SDL_MouseWheelEvent wheel;
     }
 }
