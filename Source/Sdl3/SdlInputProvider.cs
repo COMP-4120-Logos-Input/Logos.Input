@@ -28,8 +28,7 @@ namespace Logos.Input.Sdl3
 
         public IEnumerable<IInputDevice> ConnectedDevices
         {
-            // Should we also return mice here?
-            get => _keyboards.Values;
+            get => _keyboards.Values.Cast<IInputDevice>().Concat(_mice.Values);
         }
 
         public event EventHandler<InputEventArgs>? DeviceConnected;
@@ -92,7 +91,7 @@ namespace Logos.Input.Sdl3
                     }
                     case SDL_EventType.SDL_EVENT_MOUSE_REMOVED:
                     {
-                        if (_mice.Remove(e.kdevice.which, out MouseDevice? mouse))
+                        if (_mice.Remove(e.mdevice.which, out MouseDevice? mouse))
                         {
                             mouse.IsConnected = false;
                             DeviceDisconnected?.Invoke(this, new InputEventArgs(mouse, timestamp));
@@ -101,17 +100,17 @@ namespace Logos.Input.Sdl3
                     }
                     case SDL_EventType.SDL_EVENT_MOUSE_BUTTON_DOWN:
                     {
-                        if (_mice.TryGetValue(e.mdevice.which, out MouseDevice? mouse))
+                        if (_mice.TryGetValue(e.button.which, out MouseDevice? mouse))
                         {
                             MouseButton button = SDLButtonToMouseButton(e.button.button);
-                            mouse.OnButtonReleased(new MouseButtonEventArgs(button, timestamp));
+                            mouse.OnButtonPressed(new MouseButtonEventArgs(button, timestamp));
                             DeviceUpdated?.Invoke(this, new InputEventArgs(mouse, timestamp));
                         }
                         continue;
                     }
                     case SDL_EventType.SDL_EVENT_MOUSE_BUTTON_UP:
                     {
-                        if (_mice.TryGetValue(e.mdevice.which, out MouseDevice? mouse))
+                        if (_mice.TryGetValue(e.button.which, out MouseDevice? mouse))
                         {
                             MouseButton button = SDLButtonToMouseButton(e.button.button);
                             mouse.OnButtonReleased(new MouseButtonEventArgs(button, timestamp));
@@ -121,7 +120,7 @@ namespace Logos.Input.Sdl3
                     }
                     case SDL_EventType.SDL_EVENT_MOUSE_MOTION:
                     {
-                        if (_mice.TryGetValue(e.mdevice.which, out MouseDevice? mouse))
+                        if (_mice.TryGetValue(e.motion.which, out MouseDevice? mouse))
                         {
                             Vector2 pos = new Vector2(e.motion.x, e.motion.y);
                             mouse.OnCursorMoved(new MouseCursorEventArgs(pos, timestamp));
@@ -134,7 +133,7 @@ namespace Logos.Input.Sdl3
                      */
                     case SDL_EventType.SDL_EVENT_MOUSE_WHEEL:
                     {
-                        if (_mice.TryGetValue(e.mdevice.which, out MouseDevice? mouse))
+                        if (_mice.TryGetValue(e.wheel.which, out MouseDevice? mouse))
                         {
                             Vector2 rotation = new Vector2(e.wheel.x, e.wheel.y);
                             mouse.OnWheelRolled(new MouseWheelEventArgs(rotation, timestamp));
@@ -214,7 +213,10 @@ namespace Logos.Input.Sdl3
             private Vector2 _cursorPosition = new Vector2(0, 0);
             private Vector2 _wheelRotation = new Vector2(0, 0);
             
-            public Vector2 WheelRotation { get; }
+            public Vector2 WheelRotation
+            {
+                get => _wheelRotation;
+            }
             public event EventHandler<MouseButtonEventArgs>? ButtonPressed;
             public event EventHandler<MouseButtonEventArgs>? ButtonReleased;
             public event EventHandler<MouseWheelEventArgs>? WheelRolled;
@@ -248,7 +250,10 @@ namespace Logos.Input.Sdl3
                 CursorMoved?.Invoke(this, args);
             }
 
-            Vector2 IMouseDevice.CursorPosition { get; }
+            Vector2 IMouseDevice.CursorPosition
+            {
+                get => _cursorPosition;
+            }
         }
     }
 }
