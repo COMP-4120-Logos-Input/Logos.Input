@@ -103,7 +103,7 @@ namespace Logos.Input.Tests
                 Assert.That(keyReleasedArgs.Key, Is.EqualTo(KeyCode.B));
                 Assert.That(keyReleasedArgs.IsRepeat, Is.False);
                 Assert.That(keyboard.IsKeyPressed(KeyCode.B), Is.False);
-                Assert.That(keyboard.PressedKeys, Does.Not.Contain(KeyCode.A));
+                Assert.That(keyboard.PressedKeys, Does.Not.Contain(KeyCode.B));
             }
         }
 
@@ -257,6 +257,30 @@ namespace Logos.Input.Tests
             provider.DeviceUpdated += (_, _) => Assert.Fail();
             provider.Update();
             Assert.That(provider.ConnectedDevices, Is.Empty);
+        }
+
+        [Test]
+        public void Update_WhenMouseReceivesMultipleWheelEvents_UsesLatestWheelRotation()
+        {
+            SdlInputProvider provider = SetUpFakeMouse(out IMouseDevice mouse);
+
+            EventQueueMarshal.OnMouseWheelRolled(FakeMouseId, 6.0f, 7.0f);
+            EventQueueMarshal.OnMouseWheelRolled(FakeMouseId, 7.0f, 6.0f);
+
+            provider.Update();
+            Assert.That(mouse.WheelRotation, Is.EqualTo(new Vector2(7.0f, 6.0f)));
+        }
+
+        [Test]
+        public void Update_WhenMouseReceivesMultipleMoveEvents_UsesLatestCursorPosition()
+        {
+            SdlInputProvider provider = SetUpFakeMouse(out IMouseDevice mouse);
+
+            EventQueueMarshal.OnMouseMoved(FakeMouseId, 60.0f, 70.0f);
+            EventQueueMarshal.OnMouseMoved(FakeMouseId, 70.0f, 60.0f);
+
+            provider.Update();
+            Assert.That(mouse.CursorPosition, Is.EqualTo(new Vector2(70.0f, 60.0f)));
         }
 
         private static SdlInputProvider SetUpFakeKeyboard(out IKeyboardDevice keyboard)
