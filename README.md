@@ -1,6 +1,22 @@
+<!-- Daly says that the instructions to build are buried in paragraphs which doesn't seem true to me since I feel the direction are clear on how to build it and the steps are listed in order. Thus I believe he may be talking about the `Dependencies` section. So I will update the `Dependencies` section to make it more clear. It will likely go right before the `Build and Run` section -->
+
 # Logos.Input
 
-## Source Code
+## Overview
+Logos.Input is a free and open-source C# library which provides developers with high-level components to create their own platform agnostic input processing systems. It acts as an abstraction layer that sits between an underlying low-level input library (such as [Simple DirectMedia Layer](https://github.com/libsdl-org/SDL/releases)) and application code. The library is designed to be highly modular, allowing developers to pick and choose which components to include in their input processing system.
+Unlike many other input processing libraries, Logos.Input supports mapping of inputs to generic actions and values allowing developers to work with devices that may not be fully recognized by the underlying input layer. Logos.Input also comes with support for customizable control schemes, all while remaining usable across any environment supported by that underlying input layer.
+
+Developers looking for an event-driven, platform-agnostic, and high-level input library should consider using Logos.Input.
+
+## Features
+- Platform-agnostic abstraction over low-level input libraries
+- Modular input system design
+- Keyboard and mouse support
+- Event-driven input handling
+- Input mapping to generic actions/values
+- Customizable control schemes
+
+## Build and Run
 
 The entire source code can be found in this GitHub repository. To build the source code:
 
