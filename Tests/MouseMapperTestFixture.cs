@@ -1,7 +1,7 @@
 ﻿namespace Logos.Input.Tests
 {
     [TestFixture, TestOf(typeof(MouseMapper))]
-    public sealed class MouseMapperTestFixture
+    public sealed class MouseMapperTestFixture : MeasurableTestFixture
     {
     }
 }
