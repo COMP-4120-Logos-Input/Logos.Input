@@ -17,7 +17,14 @@ Developers looking for an event-driven, platform-agnostic, and high-level input 
 - Event-driven input handling
 - Input mapping to generic actions/values
 - Customizable control schemes
+
+## Performance / Accuracy
+Unit tests have been performed to measure the accuracy of our library with currently supported devices (mouse and keyboard) using the SDL3 library:
+
+[Insert python generated graph here]!!!!!!!!!!!!!!!
+
 ---
+
 ## Installation
 ### Dependencies
 #### [Simple DirectMedia Layer](https://github.com/libsdl-org/SDL/releases) (LTS)
@@ -50,14 +57,22 @@ Alternatively, you may build the solution from the command line using the `dotne
 
 ---
 
+## Running The Unit Tests
+
+You can build and run the unit tests within your IDE or code editor of choice using their respective testing features. Alternatively, you can use the `dotnet test` command within the command line to build and run the unit tests. See Microsoft's [documentation](https://learn.microsoft.com/en-us/dotnet/core/tools/dotnet-test) for more information.
+
+Automated tests operate on simulated inputs generated using SDL3, which test the functionality of input processing components in a controlled setting. Manual tests (annotated with the `[Explicit]` attribute in the source code) do not run as part of the automated test suite, but can be ran individually to test how components react to inputs from physical devices. Currently, we are resolving issues with the manual tests that prevent them from working properly, but the automated tests should be able to pass or fail in a consistent manner.
+
+--- 
+
+## Generating the Accuracy Chart
+[Insert directions to generate the chart]!!!!!!!!!!!!!!!!!!!
+
+---
+
+<!-- Should we keep this? -->
 ## Folder Layout
 
 * **Libraries:** Stores precompiled native libraries that Logos.Input depends on, but cannot be built using C# build tools.
 * **Source:** Stores implementation of input processing components provided by Logos.Input, including extensions for SDL3.
 * **Tests:** Stores unit tests that verify the functionality of input processing components provided by Logos.Input.
-
-## Unit Tests
-
-You can build and run the unit tests within your IDE or code editor of choice using their respective testing features. Alternatively, you can use the `dotnet test` command within the command line to build and run the unit tests. See Microsoft's [documentation](https://learn.microsoft.com/en-us/dotnet/core/tools/dotnet-test) for more information.
-
-Automated tests operate on simulated inputs generated using SDL3, which test the functionality of input processing components in a controlled setting. Manual tests (annotated with the `[Explicit]` attribute in the source code) do not run as part of the automated test suite, but can be ran individually to test how components react to inputs from physical devices. Currently, we are resolving issues with the manual tests that prevent them from working properly, but the automated tests should be able to pass or fail in a consistent manner.
