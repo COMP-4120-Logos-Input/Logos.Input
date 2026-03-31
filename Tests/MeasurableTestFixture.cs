@@ -55,8 +55,8 @@ namespace Logos.Input.Tests
         public static void SaveResultsToFile()
         {
             string contents = $"Keyboard Success Rate,Mouse Success Rate\n" +
-                              $"{(double)s_keyboardSuccessCount / s_keyboardTestCount:p}," +
-                              $"{(double)s_mouseSuccessCount / s_mouseTestCount:p}";
+                              $"{(double)s_keyboardSuccessCount / s_keyboardTestCount}," +
+                              $"{(double)s_mouseSuccessCount / s_mouseTestCount}";
             File.WriteAllText("Results.csv", contents);
         }
     }
