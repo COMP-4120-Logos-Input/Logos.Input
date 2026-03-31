@@ -4,7 +4,7 @@ using NUnit.Framework;
 
 namespace Logos.Input.Tests
 {
-    [TestFixture, TestOf(typeof(KeyboardMapper)), Category(KeyboardCategory)]
+    [TestFixture, TestOf(typeof(KeyboardMapper))]
     public sealed class KeyboardMapperTestFixture : MeasurableTestFixture
     {
         [Test, Category(KeyboardCategory)]

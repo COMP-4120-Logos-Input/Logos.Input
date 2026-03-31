@@ -5,7 +5,7 @@ using NUnit.Framework;
 
 namespace Logos.Input.Tests
 {
-    [TestFixture, TestOf(typeof(MouseMapper)), Category(MouseCategory)]
+    [TestFixture, TestOf(typeof(MouseMapper))]
     public sealed class MouseMapperTestFixture : MeasurableTestFixture
     {
         [Test, Category(MouseCategory)]
