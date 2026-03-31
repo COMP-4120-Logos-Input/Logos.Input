@@ -8,7 +8,7 @@ namespace Logos.Input.Tests
     [TestFixture, TestOf(typeof(MouseMapper)), Category(MouseCategory)]
     public sealed class MouseMapperTestFixture : MeasurableTestFixture
     {
-        [Test]
+        [Test, Category(MouseCategory)]
         public void BindButtonPress_triggers_handler_on_button_press()
         {
             var mapper = new MouseMapper();
@@ -24,7 +24,7 @@ namespace Logos.Input.Tests
             Assert.That(captured, Is.EqualTo(input));
         }
 
-        [Test]
+        [Test, Category(MouseCategory)]
         public void BindButtonRelease_triggers_handler_on_button_release()
         {
             var mapper = new MouseMapper();
@@ -40,7 +40,7 @@ namespace Logos.Input.Tests
             Assert.That(captured, Is.EqualTo(input));
         }
 
-        [Test]
+        [Test, Category(MouseCategory)]
         public void BindCursorMotion_triggers_handler_on_cursor_move()
         {
             var mapper = new MouseMapper();
@@ -56,7 +56,7 @@ namespace Logos.Input.Tests
             Assert.That(captured, Is.EqualTo(input));
         }
 
-        [Test]
+        [Test, Category(MouseCategory)]
         public void BindWheelRotation_triggers_handler_on_wheel_roll()
         {
             var mapper = new MouseMapper();
@@ -72,7 +72,7 @@ namespace Logos.Input.Tests
             Assert.That(captured, Is.EqualTo(input));
         }
 
-        [Test]
+        [Test, Category(MouseCategory)]
         public void UnbindCursorMotion_stops_receiving_cursor_events()
         {
             var mapper = new MouseMapper();

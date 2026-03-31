@@ -7,7 +7,7 @@ namespace Logos.Input.Tests
     [TestFixture, TestOf(typeof(KeyboardMapper)), Category(KeyboardCategory)]
     public sealed class KeyboardMapperTestFixture : MeasurableTestFixture
     {
-        [Test]
+        [Test, Category(KeyboardCategory)]
         public void BindKeyPress_triggers_handler_on_repeat_key_event()
         {
             var mapper = new KeyboardMapper();
@@ -23,7 +23,7 @@ namespace Logos.Input.Tests
             Assert.That(captured, Is.EqualTo(input));
         }
 
-        [Test]
+        [Test, Category(KeyboardCategory)]
         public void BindKeyRepeat_triggers_handler_on_non_repeat_key_event()
         {
             var mapper = new KeyboardMapper();
@@ -39,7 +39,7 @@ namespace Logos.Input.Tests
             Assert.That(captured, Is.EqualTo(input));
         }
 
-        [Test]
+        [Test, Category(KeyboardCategory)]
         public void BindKeyRelease_triggers_handler_on_key_release_event()
         {
             var mapper = new KeyboardMapper();
@@ -55,7 +55,7 @@ namespace Logos.Input.Tests
             Assert.That(captured, Is.EqualTo(input));
         }
 
-        [Test]
+        [Test, Category(KeyboardCategory)]
         public void Disconnect_stops_receiving_key_events()
         {
             var mapper = new KeyboardMapper();
