@@ -420,3 +420,6 @@ FodyWeavers.xsd
 
 # JetBrains Rider files
 .idea/*
+
+# This file kept getting generated - GJ
+Logos.Input.sln

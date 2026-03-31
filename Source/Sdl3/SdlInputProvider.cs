@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Numerics;
 using static Logos.Input.Sdl3.SDL3;
 
 namespace Logos.Input.Sdl3
@@ -7,6 +9,7 @@ namespace Logos.Input.Sdl3
     public sealed class SdlInputProvider : IInputProvider
     {
         private readonly Dictionary<uint, KeyboardDevice> _keyboards;
+        private readonly Dictionary<uint, MouseDevice> _mice;
 
         static SdlInputProvider()
         {
@@ -20,11 +23,12 @@ namespace Logos.Input.Sdl3
         public SdlInputProvider()
         {
             _keyboards = new Dictionary<uint, KeyboardDevice>();
+            _mice = new Dictionary<uint, MouseDevice>();
         }
 
         public IEnumerable<IInputDevice> ConnectedDevices
         {
-            get => _keyboards.Values;
+            get => _keyboards.Values.Cast<IInputDevice>().Concat(_mice.Values);
         }
 
         public event EventHandler<InputEventArgs>? DeviceConnected;
@@ -78,12 +82,90 @@ namespace Logos.Input.Sdl3
 
                         continue;
                     }
+                    case SDL_EventType.SDL_EVENT_MOUSE_ADDED:
+                    {
+                        MouseDevice mouse = new MouseDevice();
+                        _mice.Add(e.mdevice.which, mouse);
+                        DeviceConnected?.Invoke(this, new InputEventArgs(mouse, timestamp));
+                        continue;
+                    }
+                    case SDL_EventType.SDL_EVENT_MOUSE_REMOVED:
+                    {
+                        if (_mice.Remove(e.mdevice.which, out MouseDevice? mouse))
+                        {
+                            mouse.IsConnected = false;
+                            DeviceDisconnected?.Invoke(this, new InputEventArgs(mouse, timestamp));
+                        }
+                        continue;
+                    }
+                    case SDL_EventType.SDL_EVENT_MOUSE_BUTTON_DOWN:
+                    {
+                        if (_mice.TryGetValue(e.button.which, out MouseDevice? mouse))
+                        {
+                            MouseButton button = SDLButtonToMouseButton(e.button.button);
+                            mouse.OnButtonPressed(new MouseButtonEventArgs(button, timestamp));
+                            DeviceUpdated?.Invoke(this, new InputEventArgs(mouse, timestamp));
+                        }
+                        continue;
+                    }
+                    case SDL_EventType.SDL_EVENT_MOUSE_BUTTON_UP:
+                    {
+                        if (_mice.TryGetValue(e.button.which, out MouseDevice? mouse))
+                        {
+                            MouseButton button = SDLButtonToMouseButton(e.button.button);
+                            mouse.OnButtonReleased(new MouseButtonEventArgs(button, timestamp));
+                            DeviceUpdated?.Invoke(this, new InputEventArgs(mouse, timestamp));
+                        }
+                        continue;
+                    }
+                    case SDL_EventType.SDL_EVENT_MOUSE_MOTION:
+                    {
+                        if (_mice.TryGetValue(e.motion.which, out MouseDevice? mouse))
+                        {
+                            Vector2 pos = new Vector2(e.motion.x, e.motion.y);
+                            mouse.OnCursorMoved(new MouseCursorEventArgs(pos, timestamp));
+                            DeviceUpdated?.Invoke(this, new InputEventArgs(mouse, timestamp));
+                        }
+                        continue;
+                    }
+                    /* THis event below doesnt handle flipped wheels which is a property of SDL_MouseWheelEvent
+                        Although it should be trivial to handle it.
+                     */
+                    case SDL_EventType.SDL_EVENT_MOUSE_WHEEL:
+                    {
+                        if (_mice.TryGetValue(e.wheel.which, out MouseDevice? mouse))
+                        {
+                            Vector2 rotation = new Vector2(e.wheel.x, e.wheel.y);
+                            mouse.OnWheelRolled(new MouseWheelEventArgs(rotation, timestamp));
+                            DeviceUpdated?.Invoke(this, new InputEventArgs(mouse, timestamp));
+                        }
+                        continue;
+                    }
                     default:
                         continue;
                 }
             }
         }
 
+        private static MouseButton SDLButtonToMouseButton(byte sdlButton)
+        {
+            switch (sdlButton)
+            {
+                case 1:
+                    return MouseButton.Left;
+                case 2:
+                    return MouseButton.Middle;
+                case 3:
+                    return MouseButton.Right;
+                case 4:
+                    return MouseButton.X1;
+                case 5:
+                    return MouseButton.X2;
+                default:
+                    return MouseButton.None;
+            }
+        }
+        
         private sealed class KeyboardDevice : IKeyboardDevice
         {
             private HashSet<KeyCode> _pressedKeys = new HashSet<KeyCode>();
@@ -114,6 +196,63 @@ namespace Logos.Input.Sdl3
             {
                 _pressedKeys.Remove(args.Key);
                 KeyReleased?.Invoke(this, args);
+            }
+        }
+
+        private sealed class MouseDevice : IMouseDevice
+        {
+            public bool IsConnected { get; set; } = true;
+
+            private HashSet<MouseButton> _pressedButtons = new HashSet<MouseButton>();
+
+            public IEnumerable<MouseButton> PressedButtons
+            {
+                get => _pressedButtons;
+            }
+
+            private Vector2 _cursorPosition = new Vector2(0, 0);
+            private Vector2 _wheelRotation = new Vector2(0, 0);
+            
+            public Vector2 WheelRotation
+            {
+                get => _wheelRotation;
+            }
+            public event EventHandler<MouseButtonEventArgs>? ButtonPressed;
+            public event EventHandler<MouseButtonEventArgs>? ButtonReleased;
+            public event EventHandler<MouseWheelEventArgs>? WheelRolled;
+            public event EventHandler<MouseCursorEventArgs>? CursorMoved;
+            public bool IsButtonPressed(MouseButton button)
+            {
+                return _pressedButtons.Contains(button);
+            }
+
+            public void OnButtonPressed(MouseButtonEventArgs args)
+            {
+                _pressedButtons.Add(args.Button);
+                ButtonPressed?.Invoke(this, args);
+            }
+
+            public void OnButtonReleased(MouseButtonEventArgs args)
+            {
+                _pressedButtons.Remove(args.Button);
+                ButtonReleased?.Invoke(this, args);
+            }
+
+            public void OnWheelRolled(MouseWheelEventArgs args)
+            {
+                _wheelRotation = args.Rotation;
+                WheelRolled?.Invoke(this, args);
+            }
+
+            public void OnCursorMoved(MouseCursorEventArgs args)
+            {
+                _cursorPosition = args.Position;
+                CursorMoved?.Invoke(this, args);
+            }
+
+            Vector2 IMouseDevice.CursorPosition
+            {
+                get => _cursorPosition;
             }
         }
     }
