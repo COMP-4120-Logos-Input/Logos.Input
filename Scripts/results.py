@@ -1,4 +1,5 @@
 import os
+import subprocess
 
-if __name__ == "main":
-    print(os.path.dirname(__file__))
+subprocess.run(['dotnet', 'test'], shell=True)
+print(os.path.exists('Tests/bin/Debug/net10.0/Results.csv'))
