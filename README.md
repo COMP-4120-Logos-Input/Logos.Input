@@ -1,5 +1,7 @@
 <!-- Daly says that the instructions to build are buried in paragraphs which doesn't seem true to me since I feel the direction are clear on how to build it and the steps are listed in order. Thus I believe he may be talking about the `Dependencies` section. So I will update the `Dependencies` section to make it more clear. It will likely go right before the `Build and Run` section -->
 
+<!-- TODO: Mention how to generate the chart -->
+
 # Logos.Input
 
 ## Overview
@@ -15,8 +17,28 @@ Developers looking for an event-driven, platform-agnostic, and high-level input 
 - Event-driven input handling
 - Input mapping to generic actions/values
 - Customizable control schemes
+---
+## Installation
+### Dependencies
+#### [Simple DirectMedia Layer](https://github.com/libsdl-org/SDL/releases) (LTS)
+- Precompiled binaries are included for:
+    - Windows x64
+    - Mac OS X arm64
+- For other platforms:
+    - Build SDL3 from source: https://github.com/libsdl-org/SDL/releases
+    - Manually copy the compiled binaries to the build output folder
 
-## Build and Run
+#### [NUnit](https://nunit.org/download/) (LTS)
+
+- Used for Unit Testing
+- Install via:
+    - NuGet (recommended) in IDEs like Visual Studio or JetBrains Rider
+    - Or download from https://nunit.org/download/ and build from source
+
+*Note: The precompiled SDL Binaries can be found within the Libraries folder. Platform-specific binaries included in this repository will be automatically copied to the build output folder when the solution is built.*
+
+
+### Build and Run
 
 The entire source code can be found in this GitHub repository. To build the source code:
 
@@ -26,17 +48,13 @@ The entire source code can be found in this GitHub repository. To build the sour
 
 Alternatively, you may build the solution from the command line using the `dotnet build` command. See Microsoft's [documentation](https://learn.microsoft.com/en-us/dotnet/core/tools/dotnet-build) for more information.
 
+---
+
 ## Folder Layout
 
 * **Libraries:** Stores precompiled native libraries that Logos.Input depends on, but cannot be built using C# build tools.
 * **Source:** Stores implementation of input processing components provided by Logos.Input, including extensions for SDL3.
 * **Tests:** Stores unit tests that verify the functionality of input processing components provided by Logos.Input.
-
-## Dependencies
-
-Logos.Input depends on the LTS version of [Simple DirectMedia Layer](https://github.com/libsdl-org/SDL/releases) to implement input processing components within the Logos.Input.Sdl namespace and simulate inputs in unit tests. Currently, this repository comes with precompiled SDL3 binaries for Windows x64 and Mac OS X arm64 platforms, which can be found within the Libraries folder. Platform-specific binaries included in this repository will be automatically copied to the build output folder when the solution is built, so no additional configuration is required. For all other platforms, you will have to compile SDL3 from its source and copy the binaries to the build output folder. If you have SDL3 binaries for a platform we've missed, let us know! We'll be happy to include it in the solution build process.
-
-Logos.Input depends on the LTS version of [NUnit](https://nunit.org/download/) to implement its unit tests. NUnit can be downloaded as a NuGet package within popular IDEs like Visual Studio and JetBrains Rider. Alternatively, NUnit can be downloaded from its website and built from its source.
 
 ## Unit Tests
 
