@@ -4,7 +4,7 @@ using Logos.Input.Sdl3;
 namespace Logos.Input.Tests
 {
     [TestFixture(TestOf = typeof(SdlInputProvider))]
-    public sealed class SdlInputProviderTestFixture
+    public sealed class SdlInputProviderTestFixture : MeasurableTestFixture
     {
         // SDL treats 0 as an invalid keyboard ID, which is perfect for our fake keyboard events.
         private const int FakeKeyboardId = 0;
@@ -17,7 +17,7 @@ namespace Logos.Input.Tests
             Assert.That(provider.ConnectedDevices, Is.Empty);
         }
 
-        [Test]
+        [Test, Category(KeyboardCategory)]
         public void Update_WhenKeyboardConnected_RaisesDeviceConnectedAndTracksDevice()
         {
             SdlInputProvider provider = new SdlInputProvider();
@@ -36,7 +36,7 @@ namespace Logos.Input.Tests
             }
         }
 
-        [Test]
+        [Test, Category(KeyboardCategory)]
         public void Update_WhenKeyboardDisconnected_RaisesDeviceDisconnectedAndRemovesDevice()
         {
             SdlInputProvider provider = new SdlInputProvider();
@@ -60,7 +60,7 @@ namespace Logos.Input.Tests
             }
         }
 
-        [Test]
+        [Test, Category(KeyboardCategory)]
         public void Update_WhenKnownKeyboardReceivesKeyPressed_RaisesKeyboardAndProviderEvents()
         {
             SdlInputProvider provider = SetUpFakeKeyboard(out IKeyboardDevice keyboard);
@@ -83,7 +83,7 @@ namespace Logos.Input.Tests
             }
         }
 
-        [Test]
+        [Test, Category(KeyboardCategory)]
         public void Update_WhenKnownKeyboardReceivesKeyReleased_RaisesKeyboardAndProviderEvents()
         {
             SdlInputProvider provider = SetUpFakeKeyboard(out IKeyboardDevice keyboard);
@@ -107,7 +107,7 @@ namespace Logos.Input.Tests
             }
         }
 
-        [Test]
+        [Test, Category(KeyboardCategory)]
         public void Update_WhenUnknownKeyboardReceivesKeyEvent_DoesNotRaiseDeviceUpdated()
         {
             SdlInputProvider provider = new SdlInputProvider();
@@ -118,7 +118,7 @@ namespace Logos.Input.Tests
             Assert.That(provider.ConnectedDevices, Is.Empty);
         }
 
-        [Test]
+        [Test, Category(MouseCategory)]
         public void Update_WhenMouseConnected_RaisesDeviceConnectedAndTracksDevice()
         {
             SdlInputProvider provider = new SdlInputProvider();
@@ -137,7 +137,7 @@ namespace Logos.Input.Tests
             }
         }
 
-        [Test]
+        [Test, Category(MouseCategory)]
         public void Update_WhenMouseDisconnected_RaisesDeviceDisconnectedAndRemovesDevice()
         {
             SdlInputProvider provider = new SdlInputProvider();
@@ -161,7 +161,7 @@ namespace Logos.Input.Tests
             }
         }
 
-        [Test]
+        [Test, Category(MouseCategory)]
         public void Update_WhenKnownMouseReceivesButtonPressed_RaisesMouseAndProviderEvents()
         {
             SdlInputProvider provider = SetUpFakeMouse(out IMouseDevice mouse);
@@ -182,7 +182,7 @@ namespace Logos.Input.Tests
             }
         }
 
-        [Test]
+        [Test, Category(MouseCategory)]
         public void Update_WhenKnownMouseReceivesButtonReleased_RaisesMouseAndProviderEvents()
         {
             SdlInputProvider provider = SetUpFakeMouse(out IMouseDevice mouse);
@@ -204,7 +204,7 @@ namespace Logos.Input.Tests
             }
         }
 
-        [Test]
+        [Test, Category(MouseCategory)]
         public void Update_WhenKnownMouseReceivesCursorMoved_RaisesMouseAndProviderEvents()
         {
             SdlInputProvider provider = SetUpFakeMouse(out IMouseDevice mouse);
@@ -226,7 +226,7 @@ namespace Logos.Input.Tests
             }
         }
 
-        [Test]
+        [Test, Category(MouseCategory)]
         public void Update_WhenKnownMouseReceivesWheelRolled_RaisesMouseAndProviderEvents()
         {
             SdlInputProvider provider = SetUpFakeMouse(out IMouseDevice mouse);
@@ -248,7 +248,7 @@ namespace Logos.Input.Tests
             }
         }
 
-        [Test]
+        [Test, Category(MouseCategory)]
         public void Update_WhenUnknownMouseReceivesButtonEvent_DoesNotRaiseDeviceUpdated()
         {
             SdlInputProvider provider = new SdlInputProvider();
@@ -259,7 +259,7 @@ namespace Logos.Input.Tests
             Assert.That(provider.ConnectedDevices, Is.Empty);
         }
 
-        [Test]
+        [Test, Category(MouseCategory)]
         public void Update_WhenMouseReceivesMultipleWheelEvents_UsesLatestWheelRotation()
         {
             SdlInputProvider provider = SetUpFakeMouse(out IMouseDevice mouse);
@@ -271,7 +271,7 @@ namespace Logos.Input.Tests
             Assert.That(mouse.WheelRotation, Is.EqualTo(new Vector2(7.0f, 6.0f)));
         }
 
-        [Test]
+        [Test, Category(MouseCategory)]
         public void Update_WhenMouseReceivesMultipleMoveEvents_UsesLatestCursorPosition()
         {
             SdlInputProvider provider = SetUpFakeMouse(out IMouseDevice mouse);
