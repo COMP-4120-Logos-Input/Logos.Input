@@ -21,9 +21,8 @@ Developers looking for an event-driven, platform-agnostic, and high-level input 
 ## Performance / Accuracy
 Unit tests have been performed to measure the accuracy of our library with currently supported devices (mouse and keyboard) using the SDL3 library:
 
-![Unit Test Results](imgs\Figure_1.png)
+![Unit Test Results](imgs/Figure_1.png)
 
----
 
 ## Installation
 ### Dependencies
@@ -66,15 +65,11 @@ The entire source code can be found in this GitHub repository. To build the sour
 
 Alternatively, you may build the solution from the command line using the `dotnet build` command. See Microsoft's [documentation](https://learn.microsoft.com/en-us/dotnet/core/tools/dotnet-build) for more information.
 
----
-
 ## Running The Unit Tests
 
 You can build and run the unit tests within your IDE or code editor of choice using their respective testing features. Alternatively, you can use the `dotnet test` command within the command line to build and run the unit tests. See Microsoft's [documentation](https://learn.microsoft.com/en-us/dotnet/core/tools/dotnet-test) for more information.
 
 Automated tests operate on simulated inputs generated using SDL3, which test the functionality of input processing components in a controlled setting. Manual tests (annotated with the `[Explicit]` attribute in the source code) do not run as part of the automated test suite, but can be ran individually to test how components react to inputs from physical devices. Currently, we are resolving issues with the manual tests that prevent them from working properly, but the automated tests should be able to pass or fail in a consistent manner.
-
---- 
 
 ## Generating the Accuracy Chart
 1. Navigate to the root of the project directory which holds folder such as `Libraries`, `Scripts`, `Source`, `Tests` etc.
@@ -83,8 +78,6 @@ Automated tests operate on simulated inputs generated using SDL3, which test the
 $ python Scripts/results.py
 ```
 3. The project will rebuild itself and the python script will automatically open a chart displaying the results of the unit tests. These results can be downloaded and saved anywhere on the computer by clicking the `Save the figure` button on the taskbar.
-
----
 
 <!-- Should we keep this? -->
 ## Folder Layout
