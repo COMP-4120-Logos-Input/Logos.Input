@@ -21,12 +21,16 @@ Developers looking for an event-driven, platform-agnostic, and high-level input 
 ## Performance / Accuracy
 Unit tests have been performed to measure the accuracy of our library with currently supported devices (mouse and keyboard) using the SDL3 library:
 
-[Insert python generated graph here]!!!!!!!!!!!!!!!
+![Unit Test Results](imgs\Figure_1.png)
 
 ---
 
 ## Installation
 ### Dependencies
+#### [.NET 10 SDK](https://dotnet.microsoft.com/en-us/download/dotnet/10.0)
+- Includes the C# compiler and build tools required to build and run the project.
+- Download: https://dotnet.microsoft.com/en-us/download/dotnet/10.0
+
 #### [Simple DirectMedia Layer](https://github.com/libsdl-org/SDL/releases) (LTS)
 - Precompiled binaries are included for:
     - Windows x64
@@ -41,6 +45,13 @@ Unit tests have been performed to measure the accuracy of our library with curre
 - Install via:
     - NuGet (recommended) in IDEs like Visual Studio or JetBrains Rider
     - Or download from https://nunit.org/download/ and build from source
+
+#### [Python 3.9 or later](https://www.python.org/downloads/)
+- Required to run the results script and generate the accuracy chart
+- Install required packages:
+```bash
+$ pip install pandas matplotlib
+```
 
 *Note: The precompiled SDL Binaries can be found within the Libraries folder. Platform-specific binaries included in this repository will be automatically copied to the build output folder when the solution is built.*
 
@@ -66,7 +77,12 @@ Automated tests operate on simulated inputs generated using SDL3, which test the
 --- 
 
 ## Generating the Accuracy Chart
-[Insert directions to generate the chart]!!!!!!!!!!!!!!!!!!!
+1. Navigate to the root of the project directory which holds folder such as `Libraries`, `Scripts`, `Source`, `Tests` etc.
+2. In the terminal, run the python script by entering:
+```bash
+$ python Scripts/results.py
+```
+3. The project will rebuild itself and the python script will automatically open a chart displaying the results of the unit tests. These results can be downloaded and saved anywhere on the computer by clicking the `Save the figure` button on the taskbar.
 
 ---
 
