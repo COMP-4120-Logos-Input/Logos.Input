@@ -46,7 +46,7 @@ Unit tests have been performed to measure the accuracy of our library with curre
     - Or download from https://nunit.org/download/ and build from source
 
 #### [Python 3.9 or later](https://www.python.org/downloads/)
-- Required to run the results script and generate the accuracy chart
+- Required to generate the accuracy chart
 - Install required packages:
 ```bash
 $ pip install pandas matplotlib
@@ -72,8 +72,8 @@ You can build and run the unit tests within your IDE or code editor of choice us
 Automated tests operate on simulated inputs generated using SDL3, which test the functionality of input processing components in a controlled setting. Manual tests (annotated with the `[Explicit]` attribute in the source code) do not run as part of the automated test suite, but can be ran individually to test how components react to inputs from physical devices. Currently, we are resolving issues with the manual tests that prevent them from working properly, but the automated tests should be able to pass or fail in a consistent manner.
 
 ## Generating the Accuracy Chart
-1. Navigate to the root of the project directory which holds folder such as `Libraries`, `Scripts`, `Source`, `Tests` etc.
-2. In the terminal, run the python script by entering:
+1. Navigate to the root of the project directory which holds folders such as `Libraries`, `Scripts`, `Source`, `Tests` etc.
+2. In the terminal, run the following python script:
 ```bash
 $ python Scripts/results.py
 ```
