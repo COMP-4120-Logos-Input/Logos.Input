@@ -19,7 +19,7 @@ Developers looking for an event-driven, platform-agnostic, and high-level input 
 - Customizable control schemes
 
 ## Performance / Accuracy
-Unit tests have been performed to measure the accuracy of our library with currently supported devices (mouse and keyboard) using the SDL3 library:
+Unit tests have been performed to measure the accuracy of our library with currently supported devices (mouse and keyboard), using the SDL3 library:
 
 ![Unit Test Results](imgs/Figure_1.png)
 
@@ -39,7 +39,6 @@ Unit tests have been performed to measure the accuracy of our library with curre
     - Manually copy the compiled binaries to the build output folder
 
 #### [NUnit](https://nunit.org/download/) (LTS)
-
 - Used for Unit Testing
 - Install via:
     - NuGet (recommended) in IDEs like Visual Studio or JetBrains Rider
@@ -53,7 +52,6 @@ $ pip install pandas matplotlib
 ```
 
 *Note: The precompiled SDL Binaries can be found within the Libraries folder. Platform-specific binaries included in this repository will be automatically copied to the build output folder when the solution is built.*
-
 
 ### Build and Run
 
@@ -69,15 +67,15 @@ Alternatively, you may build the solution from the command line using the `dotne
 
 You can build and run the unit tests within your IDE or code editor of choice using their respective testing features. Alternatively, you can use the `dotnet test` command within the command line to build and run the unit tests. See Microsoft's [documentation](https://learn.microsoft.com/en-us/dotnet/core/tools/dotnet-test) for more information.
 
-Automated tests operate on simulated inputs generated using SDL3, which test the functionality of input processing components in a controlled setting. Manual tests (annotated with the `[Explicit]` attribute in the source code) do not run as part of the automated test suite, but can be ran individually to test how components react to inputs from physical devices. Currently, we are resolving issues with the manual tests that prevent them from working properly, but the automated tests should be able to pass or fail in a consistent manner.
+Automated tests operate on simulated inputs generated using SDL3, which test the functionality of input processing components in a controlled setting. Manual tests (annotated with the `[Explicit]` attribute in the source code) do not run as part of the automated test suite, but can be run individually to test how components react to inputs from physical devices. Currently, we are resolving issues with the manual tests that prevent them from working properly, but the automated tests should be able to pass or fail in a consistent manner.
 
 ## Generating the Accuracy Chart
-1. Navigate to the root of the project directory which holds folders such as `Libraries`, `Scripts`, `Source`, `Tests` etc.
-2. In the terminal, run the following python script:
+1. Navigate to the root of the project directory which contains folders such as `Libraries`, `Scripts`, `Source`, `Tests` etc.
+2. In the terminal, run the following Python script:
 ```bash
 $ python Scripts/results.py
 ```
-3. The project will rebuild itself and the python script will automatically open a chart displaying the results of the unit tests. These results can be downloaded and saved anywhere on the computer by clicking the `Save the figure` button on the taskbar.
+3. The project will rebuild itself, and the Python script will automatically open a chart displaying the results of the unit tests. These results can be downloaded and saved anywhere on the computer by clicking the `Save the figure` button on the taskbar.
 
 <!-- Should we keep this? -->
 ## Folder Layout
