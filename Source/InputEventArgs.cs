@@ -3,8 +3,7 @@
 namespace Logos.Input
 {
     /// <summary>
-    /// Represents a base class for classes that contain event data emitted by connected input
-    /// devices.
+    /// Represents a base class for classes that contain event data sent by input devices.
     /// </summary>
     public class InputEventArgs : EventArgs
     {
@@ -13,7 +12,7 @@ namespace Logos.Input
         /// data sent by the specified input device at the specified time.
         /// </summary>
         /// <param name="device">
-        /// The input device that triggered the input event.
+        /// The input device that sent the event data.
         /// </param>
         /// <param name="timestamp">
         /// The time at which the input event occured.
@@ -25,10 +24,10 @@ namespace Logos.Input
         }
 
         /// <summary>
-        /// Gets the input device that triggered the input event.
+        /// Gets the input device that sent the event data.
         /// </summary>
         /// <returns>
-        /// The input device that triggered the input event.
+        /// The input device that sent the event data.
         /// </returns>
         public IInputDevice Device { get; }
 
