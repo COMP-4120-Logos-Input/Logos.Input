@@ -28,7 +28,7 @@ namespace Logos.Input
         /// kind of input device.
         /// </returns>
         /// <exception cref="NotSupportedException">
-        /// The <see cref="IInputProvider"/> does not support input listeners of type
+        /// The <see cref="IInputProvider"/> does not contain an input listener of type
         /// <typeparamref name="T"/>.
         /// </exception>
         T GetListener<T>() where T : IInputListener;
