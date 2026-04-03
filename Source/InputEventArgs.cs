@@ -10,7 +10,7 @@ namespace Logos.Input
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="InputEventArgs"/> class that contains event
-        /// data sent by the specified input device at the specified timestamp.
+        /// data sent by the specified input device at the specified time.
         /// </summary>
         /// <param name="device">
         /// The input device that triggered the input event.
