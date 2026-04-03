@@ -4,36 +4,38 @@ using System.Collections.Generic;
 namespace Logos.Input
 {
     /// <summary>
-    /// Defines methods that access connected input devices and trigger events related to them.
+    /// Defines methods that expose input listeners and dispatch input events.
     /// </summary>
     public interface IInputProvider
     {
         /// <summary>
-        /// Returns a collection of connected input devices.
+        /// Returns a collection of supported input listeners.
         /// </summary>
         /// <returns>
-        /// A collection of connected input devices.
+        /// A collection of supported input listeners.
         /// </returns>
-        IEnumerable<IInputDevice> ConnectedDevices { get; }
+        IEnumerable<IInputListener> Listeners { get; }
 
         /// <summary>
-        /// Occurs when a new input device is connected.
+        /// Returns an input listener of type <typeparamref name="T"/> that exposes events for a
+        /// specific kind of input device.
         /// </summary>
-        event EventHandler<InputEventArgs> DeviceConnected;
+        /// <typeparam name="T">
+        /// The type of the input listener to return.
+        /// </typeparam>
+        /// <returns>
+        /// An input listener of type <typeparamref name="T"/> that exposes events for a specific
+        /// kind of input device.
+        /// </returns>
+        /// <exception cref="NotSupportedException">
+        /// The <see cref="IInputProvider"/> does not support input listeners of type
+        /// <typeparamref name="T"/>.
+        /// </exception>
+        T GetListener<T>() where T : IInputListener;
 
         /// <summary>
-        /// Occurs when an input device is disconnected.
+        /// Processes data from connected input devices and dispatches their emitted events.
         /// </summary>
-        event EventHandler<InputEventArgs> DeviceDisconnected;
-
-        /// <summary>
-        /// Occurs when the state of an input device is updated.
-        /// </summary>
-        event EventHandler<InputEventArgs> DeviceUpdated;
-
-        /// <summary>
-        /// Reads input from connected input devices and triggers events related to them.
-        /// </summary>
-        void Update();
+        void DispatchEvents();
     }
 }
