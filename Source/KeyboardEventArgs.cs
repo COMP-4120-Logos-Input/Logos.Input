@@ -1,18 +1,48 @@
-﻿namespace Logos.Input
+﻿using System;
+
+namespace Logos.Input
 {
-    public readonly record struct KeyboardEventArgs
+    /// <summary>
+    /// Provides data for key events sent by keyboard devices.
+    /// </summary>
+    public class KeyboardEventArgs : InputEventArgs
     {
-        public KeyboardEventArgs(KeyCode key, bool isRepeat, long timestamp)
+        /// <summary>
+        /// Initializes a new instance of the <see cref="InputEventArgs"/> class that contains event
+        /// data sent by the specified keyboard device at the specified time, which was triggered
+        /// by the specified key.
+        /// </summary>
+        /// <param name="device">
+        /// The keyboard device that sent the input event.
+        /// </param>
+        /// <param name="key">
+        /// The key that triggered the input event.
+        /// </param>
+        /// <param name="timestamp">
+        /// The time at which the input event occured.
+        /// </param>
+        public KeyboardEventArgs(IKeyboardDevice device, KeyCode key, TimeSpan timestamp) : base(device, timestamp)
         {
             Key = key;
-            IsRepeat = isRepeat;
-            Timestamp = timestamp;
         }
 
+        /// <summary>
+        /// Gets the keyboard device that sent the event data.
+        /// </summary>
+        /// <returns>
+        /// The keyboard device that sent the event data.
+        /// </returns>
+        public new IKeyboardDevice Device
+        {
+            get => (IKeyboardDevice)base.Device;
+        }
+
+        /// <summary>
+        /// Gets the key that triggered the input event.
+        /// </summary>
+        /// <returns>
+        /// The key that triggered the input event.
+        /// </returns>
         public KeyCode Key { get; }
-
-        public bool IsRepeat { get; }
-
-        public long Timestamp { get; }
     }
 }
