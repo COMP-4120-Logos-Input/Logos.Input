@@ -21,7 +21,7 @@ namespace Logos.Input
         /// <param name="timestamp">
         /// The time at which the input event occured.
         /// </param>
-        public KeyEventArgs(IKeyboardDevice device, KeyCode key, TimeSpan timestamp) : base(device, timestamp)
+        public KeyEventArgs(IKeyboardDevice device, TimeSpan timestamp, KeyCode key) : base(device, timestamp)
         {
             Key = key;
         }
