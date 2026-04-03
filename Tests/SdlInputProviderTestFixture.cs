@@ -243,7 +243,7 @@ namespace Logos.Input.Tests
             {
                 Assert.That(deviceUpdatedArgs.Device, Is.SameAs(mouse));
                 Assert.That(deviceUpdatedArgs.Timestamp, Is.EqualTo(wheelRolledArgs.Timestamp));
-                Assert.That(wheelRolledArgs.Rotation, Is.EqualTo(rotation));
+                Assert.That(wheelRolledArgs.Delta, Is.EqualTo(rotation));
                 Assert.That(mouse.WheelRotation, Is.EqualTo(rotation));
             }
         }

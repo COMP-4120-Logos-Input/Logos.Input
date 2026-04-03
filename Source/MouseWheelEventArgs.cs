@@ -11,7 +11,7 @@ namespace Logos.Input
         /// <summary>
         /// Initializes a new instance of the <see cref="MouseWheelEventArgs"/> class that contains
         /// event data sent by the specified mouse device at the specified time, which was triggered
-        /// by the specified change in the mouse device's scroll wheel rotation.
+        /// by the specified change in the mouse device's scroll wheel value.
         /// </summary>
         /// <param name="device">
         /// The mouse device that sent the input event.
@@ -19,12 +19,12 @@ namespace Logos.Input
         /// <param name="timestamp">
         /// The time at which the input event occured.
         /// </param>
-        /// <param name="rotation">
-        /// The change in the scroll wheel's rotation on <paramref name="device"/>.
+        /// <param name="delta">
+        /// The change in the scroll wheel's value on <paramref name="device"/>.
         /// </param>
-        public MouseWheelEventArgs(IMouseDevice device, TimeSpan timestamp, Vector2 rotation) : base(device, timestamp)
+        public MouseWheelEventArgs(IMouseDevice device, TimeSpan timestamp, Vector2 delta) : base(device, timestamp)
         {
-            Rotation = rotation;
+            Delta = delta;
         }
 
         /// <summary>
@@ -39,13 +39,13 @@ namespace Logos.Input
         }
 
         /// <summary>
-        /// The change in the scroll wheel's rotation on <see cref="Device"/> when the input event
+        /// The change in the scroll wheel's value on <see cref="Device"/> when the input event
         /// occured.
         /// </summary>
         /// <returns>
-        /// The change in the scroll wheel's rotation on <see cref="Device"/> when the input event
+        /// The change in the scroll wheel's value on <see cref="Device"/> when the input event
         /// occured.
         /// </returns>
-        public Vector2 Rotation { get; }
+        public Vector2 Delta { get; }
     }
 }

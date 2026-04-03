@@ -240,7 +240,7 @@ namespace Logos.Input.Sdl3
 
             public void OnWheelRolled(MouseWheelEventArgs args)
             {
-                _wheelRotation = args.Rotation;
+                _wheelRotation = args.Delta;
                 WheelRolled?.Invoke(this, args);
             }
 
