@@ -211,7 +211,7 @@ namespace Logos.Input.Tests
             Vector2 position = new Vector2(123.5f, 456.25f);
             EventQueueMarshal.OnMouseMoved(FakeMouseId, position.X, position.Y);
             InputEventArgs deviceUpdatedArgs = default;
-            MouseCursorEventArgs cursorMovedArgs = default;
+            MouseMotionEventArgs cursorMovedArgs = default;
 
             provider.DeviceUpdated += (_, args) => deviceUpdatedArgs = args;
             mouse.CursorMoved += (_, args) => cursorMovedArgs = args;

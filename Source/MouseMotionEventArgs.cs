@@ -2,9 +2,9 @@
 
 namespace Logos.Input
 {
-    public readonly record struct MouseCursorEventArgs
+    public readonly record struct MouseMotionEventArgs
     {
-        public MouseCursorEventArgs(Vector2 position, long timestamp)
+        public MouseMotionEventArgs(Vector2 position, long timestamp)
         {
             Position = position;
             Timestamp = timestamp;

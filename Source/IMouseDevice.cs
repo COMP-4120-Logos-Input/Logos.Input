@@ -15,7 +15,7 @@ namespace Logos.Input
 
         event EventHandler<MouseWheelEventArgs> WheelRolled;
 
-        event EventHandler<MouseCursorEventArgs> CursorMoved;
+        event EventHandler<MouseMotionEventArgs> CursorMoved;
 
         bool IsButtonPressed(MouseButton button);
     }

@@ -45,12 +45,12 @@ namespace Logos.Input.Tests
         {
             var mapper = new MouseMapper();
             var device = new FakeMouseDevice();
-            MouseCursorEventArgs? captured = null;
+            MouseMotionEventArgs? captured = null;
 
             mapper.BindCursorMotion((_, args) => captured = args);
             mapper.Connect(device);
 
-            var input = new MouseCursorEventArgs(new Vector2(10.0f, 20.0f), timestamp: 21);
+            var input = new MouseMotionEventArgs(new Vector2(10.0f, 20.0f), timestamp: 21);
             device.RaiseCursorMoved(input);
 
             Assert.That(captured, Is.EqualTo(input));
@@ -83,7 +83,7 @@ namespace Logos.Input.Tests
             mapper.Connect(device);
             mapper.UnbindCursorMotion();
 
-            device.RaiseCursorMoved(new MouseCursorEventArgs(new Vector2(5.0f, 6.0f), timestamp: 2));
+            device.RaiseCursorMoved(new MouseMotionEventArgs(new Vector2(5.0f, 6.0f), timestamp: 2));
 
             Assert.That(called, Is.False);
         }
@@ -102,7 +102,7 @@ namespace Logos.Input.Tests
 
             public event EventHandler<MouseWheelEventArgs>? WheelRolled;
 
-            public event EventHandler<MouseCursorEventArgs>? CursorMoved;
+            public event EventHandler<MouseMotionEventArgs>? CursorMoved;
 
             public bool IsButtonPressed(MouseButton button) => false;
 
@@ -114,7 +114,7 @@ namespace Logos.Input.Tests
 
             public void RaiseWheelRolled(MouseWheelEventArgs args) => WheelRolled?.Invoke(this, args);
 
-            public void RaiseCursorMoved(MouseCursorEventArgs args) => CursorMoved?.Invoke(this, args);
+            public void RaiseCursorMoved(MouseMotionEventArgs args) => CursorMoved?.Invoke(this, args);
         }
     }
 }

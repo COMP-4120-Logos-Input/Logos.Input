@@ -123,7 +123,7 @@ namespace Logos.Input.Sdl3
                         if (_mice.TryGetValue(e.motion.which, out MouseDevice? mouse))
                         {
                             Vector2 pos = new Vector2(e.motion.x, e.motion.y);
-                            mouse.OnCursorMoved(new MouseCursorEventArgs(pos, timestamp));
+                            mouse.OnCursorMoved(new MouseMotionEventArgs(pos, timestamp));
                             DeviceUpdated?.Invoke(this, new InputEventArgs(mouse, timestamp));
                         }
                         continue;
@@ -220,7 +220,7 @@ namespace Logos.Input.Sdl3
             public event EventHandler<MouseButtonEventArgs>? ButtonPressed;
             public event EventHandler<MouseButtonEventArgs>? ButtonReleased;
             public event EventHandler<MouseWheelEventArgs>? WheelRolled;
-            public event EventHandler<MouseCursorEventArgs>? CursorMoved;
+            public event EventHandler<MouseMotionEventArgs>? CursorMoved;
             public bool IsButtonPressed(MouseButton button)
             {
                 return _pressedButtons.Contains(button);
@@ -244,7 +244,7 @@ namespace Logos.Input.Sdl3
                 WheelRolled?.Invoke(this, args);
             }
 
-            public void OnCursorMoved(MouseCursorEventArgs args)
+            public void OnCursorMoved(MouseMotionEventArgs args)
             {
                 _cursorPosition = args.Position;
                 CursorMoved?.Invoke(this, args);

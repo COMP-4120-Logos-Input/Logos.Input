@@ -6,7 +6,7 @@ namespace Logos.Input
     public class MouseMapper : IInputMapper<IMouseDevice>
     {
         private readonly Dictionary<MouseButtonGesture, EventHandler<MouseButtonEventArgs>> _buttonBindings;
-        private EventHandler<MouseCursorEventArgs>? _cursorBinding;
+        private EventHandler<MouseMotionEventArgs>? _cursorBinding;
         private EventHandler<MouseWheelEventArgs>? _wheelBinding;
 
         public MouseMapper()
@@ -24,7 +24,7 @@ namespace Logos.Input
             BindEventHandler(button, MouseButtonEventType.Release, handler);
         }
 
-        public void BindCursorMotion(EventHandler<MouseCursorEventArgs> handler)
+        public void BindCursorMotion(EventHandler<MouseMotionEventArgs> handler)
         {
             _cursorBinding += handler;
         }
@@ -116,7 +116,7 @@ namespace Logos.Input
             }
         }
 
-        private void OnCursorMoved(object? sender, MouseCursorEventArgs args)
+        private void OnCursorMoved(object? sender, MouseMotionEventArgs args)
         {
             _cursorBinding?.Invoke(sender, args);
         }
