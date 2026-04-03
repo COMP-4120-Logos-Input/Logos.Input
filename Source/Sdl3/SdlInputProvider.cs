@@ -246,7 +246,7 @@ namespace Logos.Input.Sdl3
 
             public void OnCursorMoved(MouseMotionEventArgs args)
             {
-                _cursorPosition = args.Position;
+                _cursorPosition = args.Translation;
                 CursorMoved?.Invoke(this, args);
             }
 

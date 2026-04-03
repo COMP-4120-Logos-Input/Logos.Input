@@ -221,7 +221,7 @@ namespace Logos.Input.Tests
             {
                 Assert.That(deviceUpdatedArgs.Device, Is.SameAs(mouse));
                 Assert.That(deviceUpdatedArgs.Timestamp, Is.EqualTo(cursorMovedArgs.Timestamp));
-                Assert.That(cursorMovedArgs.Position, Is.EqualTo(position));
+                Assert.That(cursorMovedArgs.Translation, Is.EqualTo(position));
                 Assert.That(mouse.CursorPosition, Is.EqualTo(position));
             }
         }
