@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Logos.Input
 {
-    public class KeyboardMapper : IInputMapper<IKeyboardDevice>
+    public class KeyboardMapper : IInputMapper
     {
         private readonly Dictionary<KeyboardGesture, EventHandler<KeyEventArgs>> _bindings;
 
@@ -14,86 +14,101 @@ namespace Logos.Input
 
         public void BindKeyPress(KeyCode key, EventHandler<KeyEventArgs> handler)
         {
-            BindEventHandler(key, KeyboardEventType.Press, handler);
+            BindEvent(key, handler, KeyboardEventType.Press);
         }
 
         public void BindKeyRepeat(KeyCode key, EventHandler<KeyEventArgs> handler)
         {
-            BindEventHandler(key, KeyboardEventType.Repeat, handler);
+            BindEvent(key, handler, KeyboardEventType.Repeat);
         }
 
         public void BindKeyRelease(KeyCode key, EventHandler<KeyEventArgs> handler)
         {
-            BindEventHandler(key, KeyboardEventType.Release, handler);
+            BindEvent(key, handler, KeyboardEventType.Release);
         }
 
         public void UnbindKeyPress(KeyCode key)
         {
-            UnbindEventHandler(key, KeyboardEventType.Press);
+            UnbindEvent(key, KeyboardEventType.Press);
         }
 
         public void UnbindKeyRepeat(KeyCode key)
         {
-            UnbindEventHandler(key, KeyboardEventType.Repeat);
+            UnbindEvent(key, KeyboardEventType.Repeat);
         }
 
         public void UnbindKeyRelease(KeyCode key)
         {
-            UnbindEventHandler(key, KeyboardEventType.Release);
+            UnbindEvent(key, KeyboardEventType.Release);
         }
 
-        public void Connect(IKeyboardDevice device)
+        public void Connect(IInputProvider provider)
         {
-            ArgumentNullException.ThrowIfNull(device);
-            device.KeyPressed += OnKeyPressed;
-            device.KeyReleased += OnKeyReleased;
+            ArgumentNullException.ThrowIfNull(provider);
+            RouteEvents(provider.GetListener<IKeyboardListener>());
         }
 
-        public void Disconnect(IKeyboardDevice device)
+        public void Connect(IKeyboardListener listener)
         {
-            ArgumentNullException.ThrowIfNull(device);
-            device.KeyPressed -= OnKeyPressed;
-            device.KeyReleased -= OnKeyReleased;
+            ArgumentNullException.ThrowIfNull(listener);
+            RouteEvents(listener);
         }
 
-        private void BindEventHandler(KeyCode key, KeyboardEventType type, EventHandler<KeyEventArgs> handler)
+        public void Disconnect(IInputProvider provider)
+        {
+            ArgumentNullException.ThrowIfNull(provider);
+            BlockEvents(provider.GetListener<IKeyboardListener>());
+        }
+
+        public void Disconnect(IKeyboardListener listener)
+        {
+            ArgumentNullException.ThrowIfNull(listener);
+            BlockEvents(listener);
+        }
+
+        private void BindEvent(KeyCode key, EventHandler<KeyEventArgs> handler, KeyboardEventType type)
         {
             ArgumentNullException.ThrowIfNull(handler);
-            KeyboardGesture gesture = new KeyboardGesture(key, type);
-
-            if (_bindings.TryGetValue(gesture, out EventHandler<KeyEventArgs>? value))
-            {
-                // Append the handler to the end of the call list if an existing handler was found.
-                value += handler;
-            }
-            else
-            {
-                // Otherwise, add the handler to the dictionary.
-                value = handler;
-            }
-
-            _bindings[gesture] = value;
+            _bindings[new KeyboardGesture(key, type)] = handler;
         }
 
-        private void UnbindEventHandler(KeyCode key, KeyboardEventType type)
+        private void UnbindEvent(KeyCode key, KeyboardEventType type)
         {
             _bindings.Remove(new KeyboardGesture(key, type));
         }
 
+        private void RouteEvents(IKeyboardListener listener)
+        {
+            listener.KeyPressed += OnKeyPressed;
+            listener.KeyRepeated += OnKeyRepeated;
+            listener.KeyReleased += OnKeyReleased;
+        }
+
+        private void BlockEvents(IKeyboardListener listener)
+        {
+            listener.KeyPressed -= OnKeyPressed;
+            listener.KeyRepeated -= OnKeyRepeated;
+            listener.KeyReleased -= OnKeyReleased;
+        }
+
         private void OnKeyPressed(object? sender, KeyEventArgs args)
         {
-            KeyboardEventType type = args.IsRepeat ? KeyboardEventType.Press : KeyboardEventType.Repeat;
-            KeyboardGesture gesture = new KeyboardGesture(args.Key, type);
+            InvokeKeyEventHandler(sender, args, KeyboardEventType.Press);
+        }
 
-            if (_bindings.TryGetValue(gesture, out EventHandler<KeyEventArgs>? handler))
-            {
-                handler(sender, args);
-            }
+        private void OnKeyRepeated(object? sender, KeyEventArgs args)
+        {
+            InvokeKeyEventHandler(sender, args, KeyboardEventType.Repeat);
         }
 
         private void OnKeyReleased(object? sender, KeyEventArgs args)
         {
-            KeyboardGesture gesture = new KeyboardGesture(args.Key, KeyboardEventType.Release);
+            InvokeKeyEventHandler(sender, args, KeyboardEventType.Release);
+        }
+
+        private void InvokeKeyEventHandler(object? sender, KeyEventArgs args, KeyboardEventType type)
+        {
+            KeyboardGesture gesture = new KeyboardGesture(args.Key, type);
 
             if (_bindings.TryGetValue(gesture, out EventHandler<KeyEventArgs>? handler))
             {
