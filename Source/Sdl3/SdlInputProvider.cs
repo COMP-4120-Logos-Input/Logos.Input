@@ -66,7 +66,7 @@ namespace Logos.Input.Sdl3
                     {
                         if (_keyboards.TryGetValue(e.key.which, out KeyboardDevice? keyboard))
                         {
-                            keyboard.OnKeyPressed(new KeyboardEventArgs((KeyCode)e.key.scancode, e.key.repeat != 0, timestamp));
+                            keyboard.OnKeyPressed(new KeyEventArgs((KeyCode)e.key.scancode, e.key.repeat != 0, timestamp));
                             DeviceUpdated?.Invoke(this, new InputEventArgs(keyboard, timestamp));
                         }
 
@@ -76,7 +76,7 @@ namespace Logos.Input.Sdl3
                     {
                         if (_keyboards.TryGetValue(e.key.which, out KeyboardDevice? keyboard))
                         {
-                            keyboard.OnKeyReleased(new KeyboardEventArgs((KeyCode)e.key.scancode, false, timestamp));
+                            keyboard.OnKeyReleased(new KeyEventArgs((KeyCode)e.key.scancode, false, timestamp));
                             DeviceUpdated?.Invoke(this, new InputEventArgs(keyboard, timestamp));
                         }
 
@@ -177,22 +177,22 @@ namespace Logos.Input.Sdl3
                 get => _pressedKeys;
             }
 
-            public event EventHandler<KeyboardEventArgs>? KeyPressed;
+            public event EventHandler<KeyEventArgs>? KeyPressed;
 
-            public event EventHandler<KeyboardEventArgs>? KeyReleased;
+            public event EventHandler<KeyEventArgs>? KeyReleased;
 
             public bool IsKeyPressed(KeyCode key)
             {
                 return _pressedKeys.Contains(key);
             }
 
-            public void OnKeyPressed(KeyboardEventArgs args)
+            public void OnKeyPressed(KeyEventArgs args)
             {
                 _pressedKeys.Add(args.Key);
                 KeyPressed?.Invoke(this, args);
             }
 
-            public void OnKeyReleased(KeyboardEventArgs args)
+            public void OnKeyReleased(KeyEventArgs args)
             {
                 _pressedKeys.Remove(args.Key);
                 KeyReleased?.Invoke(this, args);

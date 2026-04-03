@@ -20,16 +20,16 @@ namespace Logos.Input
         /// <summary>
         /// Occurs when a key is pressed on a keyboard device.
         /// </summary>
-        event EventHandler<KeyboardEventArgs> KeyPressed;
+        event EventHandler<KeyEventArgs> KeyPressed;
 
         /// <summary>
         /// Occurs when a key is held down on a keyboard device.
         /// </summary>
-        event EventHandler<KeyboardEventArgs> KeyRepeated;
+        event EventHandler<KeyEventArgs> KeyRepeated;
 
         /// <summary>
         /// Occurs when a key is released on a keyboard device.
         /// </summary>
-        event EventHandler<KeyboardEventArgs> KeyReleased;
+        event EventHandler<KeyEventArgs> KeyReleased;
     }
 }

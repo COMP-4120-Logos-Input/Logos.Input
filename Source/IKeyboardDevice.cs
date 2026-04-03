@@ -7,9 +7,9 @@ namespace Logos.Input
     {
         IEnumerable<KeyCode> PressedKeys { get; }
 
-        event EventHandler<KeyboardEventArgs> KeyPressed;
+        event EventHandler<KeyEventArgs> KeyPressed;
 
-        event EventHandler<KeyboardEventArgs> KeyReleased;
+        event EventHandler<KeyEventArgs> KeyReleased;
 
         bool IsKeyPressed(KeyCode key);
     }

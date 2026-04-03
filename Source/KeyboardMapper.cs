@@ -5,24 +5,24 @@ namespace Logos.Input
 {
     public class KeyboardMapper : IInputMapper<IKeyboardDevice>
     {
-        private readonly Dictionary<KeyboardGesture, EventHandler<KeyboardEventArgs>> _bindings;
+        private readonly Dictionary<KeyboardGesture, EventHandler<KeyEventArgs>> _bindings;
 
         public KeyboardMapper()
         {
-            _bindings = new Dictionary<KeyboardGesture, EventHandler<KeyboardEventArgs>>();
+            _bindings = new Dictionary<KeyboardGesture, EventHandler<KeyEventArgs>>();
         }
 
-        public void BindKeyPress(KeyCode key, EventHandler<KeyboardEventArgs> handler)
+        public void BindKeyPress(KeyCode key, EventHandler<KeyEventArgs> handler)
         {
             BindEventHandler(key, KeyboardEventType.Press, handler);
         }
 
-        public void BindKeyRepeat(KeyCode key, EventHandler<KeyboardEventArgs> handler)
+        public void BindKeyRepeat(KeyCode key, EventHandler<KeyEventArgs> handler)
         {
             BindEventHandler(key, KeyboardEventType.Repeat, handler);
         }
 
-        public void BindKeyRelease(KeyCode key, EventHandler<KeyboardEventArgs> handler)
+        public void BindKeyRelease(KeyCode key, EventHandler<KeyEventArgs> handler)
         {
             BindEventHandler(key, KeyboardEventType.Release, handler);
         }
@@ -56,12 +56,12 @@ namespace Logos.Input
             device.KeyReleased -= OnKeyReleased;
         }
 
-        private void BindEventHandler(KeyCode key, KeyboardEventType type, EventHandler<KeyboardEventArgs> handler)
+        private void BindEventHandler(KeyCode key, KeyboardEventType type, EventHandler<KeyEventArgs> handler)
         {
             ArgumentNullException.ThrowIfNull(handler);
             KeyboardGesture gesture = new KeyboardGesture(key, type);
 
-            if (_bindings.TryGetValue(gesture, out EventHandler<KeyboardEventArgs>? value))
+            if (_bindings.TryGetValue(gesture, out EventHandler<KeyEventArgs>? value))
             {
                 // Append the handler to the end of the call list if an existing handler was found.
                 value += handler;
@@ -80,22 +80,22 @@ namespace Logos.Input
             _bindings.Remove(new KeyboardGesture(key, type));
         }
 
-        private void OnKeyPressed(object? sender, KeyboardEventArgs args)
+        private void OnKeyPressed(object? sender, KeyEventArgs args)
         {
             KeyboardEventType type = args.IsRepeat ? KeyboardEventType.Press : KeyboardEventType.Repeat;
             KeyboardGesture gesture = new KeyboardGesture(args.Key, type);
 
-            if (_bindings.TryGetValue(gesture, out EventHandler<KeyboardEventArgs>? handler))
+            if (_bindings.TryGetValue(gesture, out EventHandler<KeyEventArgs>? handler))
             {
                 handler(sender, args);
             }
         }
 
-        private void OnKeyReleased(object? sender, KeyboardEventArgs args)
+        private void OnKeyReleased(object? sender, KeyEventArgs args)
         {
             KeyboardGesture gesture = new KeyboardGesture(args.Key, KeyboardEventType.Release);
 
-            if (_bindings.TryGetValue(gesture, out EventHandler<KeyboardEventArgs>? handler))
+            if (_bindings.TryGetValue(gesture, out EventHandler<KeyEventArgs>? handler))
             {
                 handler(sender, args);
             }

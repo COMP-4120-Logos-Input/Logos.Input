@@ -5,12 +5,12 @@ namespace Logos.Input
     /// <summary>
     /// Provides data for key events sent by keyboard devices.
     /// </summary>
-    public class KeyboardEventArgs : InputEventArgs
+    public class KeyEventArgs : InputEventArgs
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="InputEventArgs"/> class that contains event
-        /// data sent by the specified keyboard device at the specified time, which was triggered
-        /// by the specified key.
+        /// Initializes a new instance of the <see cref="KeyEventArgs"/> class that contains event
+        /// data sent by the specified keyboard device at the specified time, which was triggered by
+        /// the specified key.
         /// </summary>
         /// <param name="device">
         /// The keyboard device that sent the input event.
@@ -21,7 +21,7 @@ namespace Logos.Input
         /// <param name="timestamp">
         /// The time at which the input event occured.
         /// </param>
-        public KeyboardEventArgs(IKeyboardDevice device, KeyCode key, TimeSpan timestamp) : base(device, timestamp)
+        public KeyEventArgs(IKeyboardDevice device, KeyCode key, TimeSpan timestamp) : base(device, timestamp)
         {
             Key = key;
         }

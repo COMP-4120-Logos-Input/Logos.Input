@@ -66,7 +66,7 @@ namespace Logos.Input.Tests
             SdlInputProvider provider = SetUpFakeKeyboard(out IKeyboardDevice keyboard);
             EventQueueMarshal.OnKeyPressed(FakeKeyboardId, KeyCode.A, isRepeat: true);
             InputEventArgs deviceUpdatedArgs = default;
-            KeyboardEventArgs keyPressedArgs = default;
+            KeyEventArgs keyPressedArgs = default;
 
             provider.DeviceUpdated += (_, args) => deviceUpdatedArgs = args;
             keyboard.KeyPressed += (_, args) => keyPressedArgs = args;
@@ -90,7 +90,7 @@ namespace Logos.Input.Tests
             EventQueueMarshal.OnKeyPressed(FakeKeyboardId, KeyCode.B, isRepeat: false);
             EventQueueMarshal.OnKeyReleased(FakeKeyboardId, KeyCode.B);
             InputEventArgs deviceUpdatedArgs = default;
-            KeyboardEventArgs keyReleasedArgs = default;
+            KeyEventArgs keyReleasedArgs = default;
 
             provider.DeviceUpdated += (_, args) => deviceUpdatedArgs = args;
             keyboard.KeyReleased += (_, args) => keyReleasedArgs = args;

@@ -1,15 +1,31 @@
-﻿namespace Logos.Input
+﻿using System;
+
+namespace Logos.Input
 {
-    public readonly record struct MouseButtonEventArgs
+    public class MouseButtonEventArgs : InputEventArgs
     {
-        public MouseButtonEventArgs(MouseButton button, long timestamp)
+        public MouseButtonEventArgs(IMouseDevice device, MouseButton button, TimeSpan timestamp) : base(device, timestamp)
         {
             Button = button;
-            Timestamp = timestamp;
         }
 
-        public MouseButton Button { get; }
+        /// <summary>
+        /// Gets the mouse device that sent the event data.
+        /// </summary>
+        /// <returns>
+        /// The mouse device that sent the event data.
+        /// </returns>
+        public new IMouseDevice Device
+        {
+            get => (IMouseDevice)base.Device;
+        }
 
-        public long Timestamp { get; }
+        /// <summary>
+        /// Gets the mouse button that triggered the input event.
+        /// </summary>
+        /// <returns>
+        /// The mouse button that triggered the input event.
+        /// </returns>
+        public MouseButton Button { get; }
     }
 }
