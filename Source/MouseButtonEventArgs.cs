@@ -15,11 +15,11 @@ namespace Logos.Input
         /// <param name="device">
         /// The mouse device that sent the input event.
         /// </param>
-        /// <param name="button">
-        /// The mouse button that triggered the input event.
-        /// </param>
         /// <param name="timestamp">
         /// The time at which the input event occured.
+        /// </param>
+        /// <param name="button">
+        /// The mouse button that triggered the input event.
         /// </param>
         public MouseButtonEventArgs(IMouseDevice device, TimeSpan timestamp, MouseButton button) : base(device, timestamp)
         {
