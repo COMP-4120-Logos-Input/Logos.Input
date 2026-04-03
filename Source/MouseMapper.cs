@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Logos.Input
 {
-    public class MouseMapper : IInputMapper<IMouseDevice>
+    public class MouseMapper : IInputMapper
     {
         private readonly Dictionary<MouseButtonGesture, EventHandler<MouseButtonEventArgs>> _buttonBindings;
         private EventHandler<MouseMotionEventArgs>? _cursorBinding;
@@ -16,32 +16,32 @@ namespace Logos.Input
 
         public void BindButtonPress(MouseButton button, EventHandler<MouseButtonEventArgs> handler)
         {
-            BindEventHandler(button, MouseButtonEventType.Press, handler);
+            BindEvent(button, handler, MouseButtonEventType.Press);
         }
 
         public void BindButtonRelease(MouseButton button, EventHandler<MouseButtonEventArgs> handler)
         {
-            BindEventHandler(button, MouseButtonEventType.Release, handler);
+            BindEvent(button, handler, MouseButtonEventType.Release);
         }
 
-        public void BindCursorMotion(EventHandler<MouseMotionEventArgs> handler)
+        public void BindMouseMove(EventHandler<MouseMotionEventArgs> handler)
         {
             _cursorBinding += handler;
         }
 
-        public void BindWheelRotation(EventHandler<MouseWheelEventArgs> handler)
+        public void BindWheelMove(EventHandler<MouseWheelEventArgs> handler)
         {
             _wheelBinding += handler;
         }
 
         public void UnbindButtonPress(MouseButton button)
         {
-            UnbindEventHandler(button, MouseButtonEventType.Press);
+            UnbindEvent(button, MouseButtonEventType.Press);
         }
 
         public void UnbindButtonRelease(MouseButton button)
         {
-            UnbindEventHandler(button, MouseButtonEventType.Release);
+            UnbindEvent(button, MouseButtonEventType.Release);
         }
 
         public void UnbindCursorMotion()
@@ -54,61 +54,70 @@ namespace Logos.Input
             _wheelBinding = null;
         }
 
-        public void Connect(IMouseDevice device)
+        public void Connect(IInputProvider provider)
         {
-            ArgumentNullException.ThrowIfNull(device);
-            device.ButtonPressed += OnButtonPressed;
-            device.ButtonReleased += OnButtonReleased;
-            device.CursorMoved += OnCursorMoved;
-            device.WheelRolled += OnWheelRolled;
+            ArgumentNullException.ThrowIfNull(provider);
+            RouteEvents(provider.GetListener<IMouseListener>());
         }
 
-        public void Disconnect(IMouseDevice device)
+        public void Connect(IMouseListener listener)
         {
-            ArgumentNullException.ThrowIfNull(device);
-            device.ButtonPressed -= OnButtonPressed;
-            device.ButtonReleased -= OnButtonReleased;
-            device.CursorMoved -= OnCursorMoved;
-            device.WheelRolled -= OnWheelRolled;
+            ArgumentNullException.ThrowIfNull(listener);
+            RouteEvents(listener);
         }
 
-        private void BindEventHandler(MouseButton button, MouseButtonEventType type, EventHandler<MouseButtonEventArgs> handler)
+        public void Disconnect(IMouseListener listener)
+        {
+            ArgumentNullException.ThrowIfNull(listener);
+            BlockEvents(listener);
+        }
+
+        public void Disconnect(IInputProvider provider)
+        {
+            ArgumentNullException.ThrowIfNull(provider);
+            BlockEvents(provider.GetListener<IMouseListener>());
+        }
+
+        private void BindEvent(MouseButton button, EventHandler<MouseButtonEventArgs> handler, MouseButtonEventType type)
         {
             ArgumentNullException.ThrowIfNull(handler);
-            MouseButtonGesture gesture = new MouseButtonGesture(button, type);
-
-            if (_buttonBindings.TryGetValue(gesture, out EventHandler<MouseButtonEventArgs>? value))
-            {
-                // Append the handler to the end of the call list if an existing handler was found.
-                value += handler;
-            }
-            else
-            {
-                // Otherwise, add the handler to the dictionary.
-                value = handler;
-            }
-
-            _buttonBindings[gesture] = value;
+            _buttonBindings[new MouseButtonGesture(button, type)] = handler;
         }
 
-        private void UnbindEventHandler(MouseButton button, MouseButtonEventType type)
+        private void UnbindEvent(MouseButton button, MouseButtonEventType type)
         {
             _buttonBindings.Remove(new MouseButtonGesture(button, type));
         }
 
+        private void RouteEvents(IMouseListener listener)
+        {
+            listener.ButtonPressed += OnButtonPressed;
+            listener.ButtonReleased += OnButtonReleased;
+            listener.MouseMoved += OnMouseMoved;
+            listener.WheelMoved += OnWheelMoved;
+        }
+
+        private void BlockEvents(IMouseListener listener)
+        {
+            listener.ButtonPressed -= OnButtonPressed;
+            listener.ButtonReleased -= OnButtonReleased;
+            listener.MouseMoved -= OnMouseMoved;
+            listener.WheelMoved -= OnWheelMoved;
+        }
+
         private void OnButtonPressed(object? sender, MouseButtonEventArgs args)
         {
-            MouseButtonGesture gesture = new MouseButtonGesture(args.Button, MouseButtonEventType.Press);
-
-            if (_buttonBindings.TryGetValue(gesture, out EventHandler<MouseButtonEventArgs>? handler))
-            {
-                handler(sender, args);
-            }
+            OnButtonEvent(sender, args, MouseButtonEventType.Press);
         }
 
         private void OnButtonReleased(object? sender, MouseButtonEventArgs args)
         {
-            MouseButtonGesture gesture = new MouseButtonGesture(args.Button, MouseButtonEventType.Release);
+            OnButtonEvent(sender, args, MouseButtonEventType.Release);
+        }
+
+        private void OnButtonEvent(object? sender, MouseButtonEventArgs args, MouseButtonEventType type)
+        {
+            MouseButtonGesture gesture = new MouseButtonGesture(args.Button, type);
 
             if (_buttonBindings.TryGetValue(gesture, out EventHandler<MouseButtonEventArgs>? handler))
             {
@@ -116,12 +125,12 @@ namespace Logos.Input
             }
         }
 
-        private void OnCursorMoved(object? sender, MouseMotionEventArgs args)
+        private void OnMouseMoved(object? sender, MouseMotionEventArgs args)
         {
             _cursorBinding?.Invoke(sender, args);
         }
 
-        private void OnWheelRolled(object? sender, MouseWheelEventArgs args)
+        private void OnWheelMoved(object? sender, MouseWheelEventArgs args)
         {
             _wheelBinding?.Invoke(sender, args);
         }
