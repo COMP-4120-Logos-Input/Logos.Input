@@ -8,7 +8,7 @@ namespace Logos.Input.Sdl3
 {
     public sealed class SdlInputProvider : IInputProvider
     {
-        private readonly Dictionary<uint, KeyboardDevice> _keyboards;
+        private readonly ObservableKeyboardCollection _keyboards;
         private readonly Dictionary<uint, MouseDevice> _mice;
 
         static SdlInputProvider()
@@ -22,64 +22,53 @@ namespace Logos.Input.Sdl3
 
         public SdlInputProvider()
         {
-            _keyboards = new Dictionary<uint, KeyboardDevice>();
+            _keyboards = new ObservableKeyboardCollection();
             _mice = new Dictionary<uint, MouseDevice>();
         }
 
-        public IEnumerable<IInputDevice> ConnectedDevices
+        public IEnumerable<IInputListener> Listeners
         {
-            get => _keyboards.Values.Cast<IInputDevice>().Concat(_mice.Values);
+            get
+            {
+                yield return _keyboards;
+            }
         }
 
-        public event EventHandler<InputEventArgs>? DeviceConnected;
+        public T GetListener<T>() where T : IInputListener
+        {
+            if (_keyboards is not T listener)
+            {
+                throw new NotSupportedException(
+                    "The SdlInputProvider does not contain the specified input listener.");
+            }
 
-        public event EventHandler<InputEventArgs>? DeviceDisconnected;
+            return listener;
+        }
 
-        public event EventHandler<InputEventArgs>? DeviceUpdated;
-
-        public void Update()
+        public void DispatchEvents()
         {
             while (SDL_PollEvent(out SDL_Event e))
             {
-                long timestamp = (long)(e.common.timestamp / TimeSpan.NanosecondsPerTick);
-
                 switch (e.type)
                 {
                     case SDL_EventType.SDL_EVENT_KEYBOARD_ADDED:
                     {
-                        KeyboardDevice keyboard = new KeyboardDevice();
-                        _keyboards.Add(e.kdevice.which, keyboard);
-                        DeviceConnected?.Invoke(this, new InputEventArgs(keyboard, timestamp));
+                        _keyboards.OnKeyboardAdded(in e.kdevice);
                         continue;
                     }
                     case SDL_EventType.SDL_EVENT_KEYBOARD_REMOVED:
                     {
-                        if (_keyboards.Remove(e.kdevice.which, out KeyboardDevice? keyboard))
-                        {
-                            keyboard.IsConnected = false;
-                            DeviceDisconnected?.Invoke(this, new InputEventArgs(keyboard, timestamp));
-                        }
-
+                        _keyboards.OnKeyboardRemoved(in e.kdevice);
                         continue;
                     }
                     case SDL_EventType.SDL_EVENT_KEY_DOWN:
                     {
-                        if (_keyboards.TryGetValue(e.key.which, out KeyboardDevice? keyboard))
-                        {
-                            keyboard.OnKeyPressed(new KeyEventArgs((KeyCode)e.key.scancode, e.key.repeat != 0, timestamp));
-                            DeviceUpdated?.Invoke(this, new InputEventArgs(keyboard, timestamp));
-                        }
-
+                        _keyboards.OnKeyDown(in e.key);
                         continue;
                     }
                     case SDL_EventType.SDL_EVENT_KEY_UP:
                     {
-                        if (_keyboards.TryGetValue(e.key.which, out KeyboardDevice? keyboard))
-                        {
-                            keyboard.OnKeyReleased(new KeyEventArgs((KeyCode)e.key.scancode, false, timestamp));
-                            DeviceUpdated?.Invoke(this, new InputEventArgs(keyboard, timestamp));
-                        }
-
+                        _keyboards.OnKeyUp(in e.key);
                         continue;
                     }
                     case SDL_EventType.SDL_EVENT_MOUSE_ADDED:
@@ -147,28 +136,14 @@ namespace Logos.Input.Sdl3
             }
         }
 
-        private static MouseButton SDLButtonToMouseButton(byte sdlButton)
+        private static TimeSpan ToTimeSpan(ulong timestamp)
         {
-            switch (sdlButton)
-            {
-                case 1:
-                    return MouseButton.Left;
-                case 2:
-                    return MouseButton.Middle;
-                case 3:
-                    return MouseButton.Right;
-                case 4:
-                    return MouseButton.X1;
-                case 5:
-                    return MouseButton.X2;
-                default:
-                    return MouseButton.None;
-            }
+            return new TimeSpan((long)(timestamp / TimeSpan.NanosecondsPerTick));
         }
-        
+
         private sealed class KeyboardDevice : IKeyboardDevice
         {
-            private HashSet<KeyCode> _pressedKeys = new HashSet<KeyCode>();
+            private readonly HashSet<KeyCode> _pressedKeys = new HashSet<KeyCode>();
 
             public bool IsConnected { get; set; } = true;
 
@@ -177,25 +152,19 @@ namespace Logos.Input.Sdl3
                 get => _pressedKeys;
             }
 
-            public event EventHandler<KeyEventArgs>? KeyPressed;
-
-            public event EventHandler<KeyEventArgs>? KeyReleased;
-
             public bool IsKeyPressed(KeyCode key)
             {
                 return _pressedKeys.Contains(key);
             }
 
-            public void OnKeyPressed(KeyEventArgs args)
+            public void OnKeyDown(SDL_Scancode key)
             {
-                _pressedKeys.Add(args.Key);
-                KeyPressed?.Invoke(this, args);
+                _pressedKeys.Add((KeyCode)key);
             }
 
-            public void OnKeyReleased(KeyEventArgs args)
+            public void OnKeyUp(SDL_Scancode key)
             {
-                _pressedKeys.Remove(args.Key);
-                KeyReleased?.Invoke(this, args);
+                _pressedKeys.Remove((KeyCode)key);
             }
         }
 
@@ -253,6 +222,76 @@ namespace Logos.Input.Sdl3
             Vector2 IMouseDevice.CursorPosition
             {
                 get => _cursorPosition;
+            }
+        }
+
+        private sealed class ObservableKeyboardCollection : Dictionary<uint, KeyboardDevice>, IKeyboardListener
+        {
+            IEnumerable<IInputDevice> IInputListener.ConnectedDevices
+            {
+                get => Values;
+            }
+
+            public event EventHandler<InputEventArgs>? DeviceConnected;
+
+            public event EventHandler<InputEventArgs>? DeviceDisconnected;
+
+            public event EventHandler<KeyEventArgs>? KeyPressed;
+
+            public event EventHandler<KeyEventArgs>? KeyRepeated;
+
+            public event EventHandler<KeyEventArgs>? KeyReleased;
+
+            public IEnumerable<IKeyboardDevice> ConnectedDevices
+            {
+                get => Values;
+            }
+
+            public void OnKeyboardAdded(ref readonly SDL_KeyboardDeviceEvent e)
+            {
+                KeyboardDevice device = new KeyboardDevice();
+
+                if (TryAdd(e.which, device))
+                {
+                    DeviceConnected?.Invoke(this, CreateEventArgs(device, in e));
+                }
+            }
+
+            public void OnKeyboardRemoved(ref readonly SDL_KeyboardDeviceEvent e)
+            {
+                if (Remove(e.which, out KeyboardDevice? device))
+                {
+                    DeviceDisconnected?.Invoke(this, CreateEventArgs(device, in e));
+                }
+            }
+
+            public void OnKeyDown(ref readonly SDL_KeyboardEvent e)
+            {
+                if (TryGetValue(e.which, out KeyboardDevice? device))
+                {
+                    device.OnKeyDown(e.scancode);
+                    EventHandler<KeyEventArgs>? handler = e.repeat == 0 ? KeyPressed : KeyReleased;
+                    handler?.Invoke(this, CreateEventArgs(device, in e));
+                }
+            }
+
+            public void OnKeyUp(ref readonly SDL_KeyboardEvent e)
+            {
+                if (TryGetValue(e.which, out KeyboardDevice? device))
+                {
+                    device.OnKeyUp(e.scancode);
+                    KeyReleased?.Invoke(this, CreateEventArgs(device, in e));
+                }
+            }
+
+            private static InputEventArgs CreateEventArgs(KeyboardDevice device, ref readonly SDL_KeyboardDeviceEvent e)
+            {
+                return new InputEventArgs(device, ToTimeSpan(e.timestamp));
+            }
+
+            private static KeyEventArgs CreateEventArgs(KeyboardDevice device, ref readonly SDL_KeyboardEvent e)
+            {
+                return new KeyEventArgs(device, ToTimeSpan(e.timestamp), (KeyCode)e.key);
             }
         }
     }
