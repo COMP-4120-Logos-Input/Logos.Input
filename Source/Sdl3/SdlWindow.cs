@@ -15,6 +15,9 @@ namespace Logos.Input.Sdl3
 
         public SdlWindow(string title, int width, int height, SDL_WindowFlags flags = SDL_WindowFlags.SDL_WINDOW_RESIZABLE)
         {
+            if (!SDL_Init(SDL_InitFlags.SDL_INIT_VIDEO))
+                throw new Exception("SDL video initialization failed");
+            
             _handle = SDL_CreateWindow(title, width, height, flags);
             
             if (_handle == nint.Zero)

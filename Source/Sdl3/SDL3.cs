@@ -8,7 +8,7 @@ namespace Logos.Input.Sdl3
     {
         static SDL3()
         {
-            // Quits SDL when the parent process is about to die.
+
         }
 
         [LibraryImport(nameof(SDL3))]
@@ -49,5 +49,9 @@ namespace Logos.Input.Sdl3
         [LibraryImport(nameof(SDL3))]
         [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
         public static partial nint SDL_GetMice(out int count);
+        
+        [LibraryImport(nameof(SDL3))]
+        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+        public static partial void SDL_free(nint mem);
     }
 }
