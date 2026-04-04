@@ -125,40 +125,78 @@ namespace Logos.Input
             _wheelBindings.Remove(direction);
         }
 
-        public void Connect(IInputProvider provider)
+        /// <summary>
+        /// Routes events exposed by a mouse listener contained by the specified input provider to
+        /// the <see cref="MouseMapper"/>.
+        /// </summary>
+        /// <param name="provider">
+        /// The input provider containing a mouse listener whose events are to be routed to the
+        /// <see cref="MouseMapper"/>.
+        /// </param>
+        /// <exception cref="ArgumentNullException">
+        /// <paramref name="provider"/> is <see langword="null"/>.
+        /// </exception>
+        /// <exception cref="NotSupportedException">
+        /// <paramref name="provider"/> does not contain a mouse listener.
+        /// </exception>
+        public void RouteEvents(IInputProvider provider)
         {
             ArgumentNullException.ThrowIfNull(provider);
             RouteEvents(provider.GetListener<IMouseListener>());
         }
 
-        public void Connect(IMouseListener listener)
+        /// <summary>
+        /// Routes events exposed by the specified mouse listener to the <see cref="MouseMapper"/>.
+        /// </summary>
+        /// <param name="listener">
+        /// The mouse listener whose events are to be routed to the <see cref="MouseMapper"/>.
+        /// </param>
+        /// <exception cref="ArgumentNullException">
+        /// <paramref name="listener"/> is <see langword="null"/>.
+        /// </exception>
+        public void RouteEvents(IMouseListener listener)
         {
             ArgumentNullException.ThrowIfNull(listener);
-            RouteEvents(listener);
-        }
-
-        public void Disconnect(IMouseListener listener)
-        {
-            ArgumentNullException.ThrowIfNull(listener);
-            BlockEvents(listener);
-        }
-
-        public void Disconnect(IInputProvider provider)
-        {
-            ArgumentNullException.ThrowIfNull(provider);
-            BlockEvents(provider.GetListener<IMouseListener>());
-        }
-
-        private void RouteEvents(IMouseListener listener)
-        {
             listener.ButtonPressed += OnButtonPressed;
             listener.ButtonReleased += OnButtonReleased;
             listener.MouseMoved += OnMouseMoved;
             listener.WheelMoved += OnWheelMoved;
         }
 
-        private void BlockEvents(IMouseListener listener)
+        /// <summary>
+        /// Blocks events exposed by a mouse listener contained by the specified input provider
+        /// from reaching the <see cref="MouseMapper"/>.
+        /// </summary>
+        /// <param name="provider">
+        /// The input provider containing a mouse listener whose events are to be blocked from
+        /// reaching the <see cref="MouseMapper"/>.
+        /// </param>
+        /// <exception cref="ArgumentNullException">
+        /// <paramref name="provider"/> is <see langword="null"/>.
+        /// </exception>
+        /// <exception cref="NotSupportedException">
+        /// <paramref name="provider"/> does not contain a mouse listener.
+        /// </exception>
+        public void BlockEvents(IInputProvider provider)
         {
+            ArgumentNullException.ThrowIfNull(provider);
+            BlockEvents(provider.GetListener<IMouseListener>());
+        }
+
+        /// <summary>
+        /// Blocks events exposed by the specified mouse listener from reaching the
+        /// <see cref="MouseMapper"/>.
+        /// </summary>
+        /// <param name="listener">
+        /// The mouse listener whose events are to be blocked from reaching the
+        /// <see cref="MouseMapper"/>.
+        /// </param>
+        /// <exception cref="ArgumentNullException">
+        /// <paramref name="listener"/> is <see langword="null"/>.
+        /// </exception>
+        public void BlockEvents(IMouseListener listener)
+        {
+            ArgumentNullException.ThrowIfNull(listener);
             listener.ButtonPressed -= OnButtonPressed;
             listener.ButtonReleased -= OnButtonReleased;
             listener.MouseMoved -= OnMouseMoved;
@@ -215,7 +253,7 @@ namespace Logos.Input
             }
         }
 
-        private int ToDirectionFlags(Vector2 direction)
+        private static int ToDirectionFlags(Vector2 direction)
         {
             int flags = 0;
 
@@ -227,7 +265,7 @@ namespace Logos.Input
             {
                 flags |= DownDirectionFlag;
             }
-            
+
             if (direction.X > 0.0f)
             {
                 flags |= LeftDirectionFlag;

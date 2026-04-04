@@ -52,11 +52,11 @@ namespace Logos.Input
         }
 
         /// <summary>
-        /// Routes events exposed by keyboard listeners contained by the specified input provider
+        /// Routes events exposed by a keyboard listener contained by the specified input provider
         /// to the <see cref="KeyboardMapper"/>.
         /// </summary>
         /// <param name="provider">
-        /// The input provider containing keyboard listeners whose events can be routed to the
+        /// The input provider containing a keyboard listener whose events are to be routed to the
         /// <see cref="KeyboardMapper"/>.
         /// </param>
         /// <exception cref="ArgumentNullException">
@@ -65,7 +65,7 @@ namespace Logos.Input
         /// <exception cref="NotSupportedException">
         /// <paramref name="provider"/> does not contain a keyboard listener.
         /// </exception>
-        public void Connect(IInputProvider provider)
+        public void RouteEvents(IInputProvider provider)
         {
             ArgumentNullException.ThrowIfNull(provider);
             RouteEvents(provider.GetListener<IKeyboardListener>());
@@ -76,23 +76,25 @@ namespace Logos.Input
         /// <see cref="KeyboardMapper"/>.
         /// </summary>
         /// <param name="listener">
-        /// The keyboard listener whose events can be routed to the <see cref="KeyboardMapper"/>.
+        /// The keyboard listener whose events are to be routed to the <see cref="KeyboardMapper"/>.
         /// </param>
         /// <exception cref="ArgumentNullException">
         /// <paramref name="listener"/> is <see langword="null"/>.
         /// </exception>
-        public void Connect(IKeyboardListener listener)
+        public void RouteEvents(IKeyboardListener listener)
         {
             ArgumentNullException.ThrowIfNull(listener);
-            RouteEvents(listener);
+            listener.KeyPressed += OnKeyPressed;
+            listener.KeyRepeated += OnKeyRepeated;
+            listener.KeyReleased += OnKeyReleased;
         }
 
         /// <summary>
-        /// Blocks events exposed by keyboard listeners contained by the specified input provider
+        /// Blocks events exposed by a keyboard listener contained by the specified input provider
         /// from reaching the <see cref="KeyboardMapper"/>.
         /// </summary>
         /// <param name="provider">
-        /// The input provider containing keyboard listeners whose events are to be blocked from
+        /// The input provider containing a keyboard listener whose events are to be blocked from
         /// reaching the <see cref="KeyboardMapper"/>.
         /// </param>
         /// <exception cref="ArgumentNullException">
@@ -101,14 +103,14 @@ namespace Logos.Input
         /// <exception cref="NotSupportedException">
         /// <paramref name="provider"/> does not contain a keyboard listener.
         /// </exception>
-        public void Disconnect(IInputProvider provider)
+        public void BlockEvents(IInputProvider provider)
         {
             ArgumentNullException.ThrowIfNull(provider);
             BlockEvents(provider.GetListener<IKeyboardListener>());
         }
 
         /// <summary>
-        /// Blocks events exposed by the specified keyboard listene from reaching the
+        /// Blocks events exposed by the specified keyboard listener from reaching the
         /// <see cref="KeyboardMapper"/>.
         /// </summary>
         /// <param name="listener">
@@ -118,21 +120,9 @@ namespace Logos.Input
         /// <exception cref="ArgumentNullException">
         /// <paramref name="listener"/> is <see langword="null"/>.
         /// </exception>
-        public void Disconnect(IKeyboardListener listener)
+        public void BlockEvents(IKeyboardListener listener)
         {
             ArgumentNullException.ThrowIfNull(listener);
-            BlockEvents(listener);
-        }
-
-        private void RouteEvents(IKeyboardListener listener)
-        {
-            listener.KeyPressed += OnKeyPressed;
-            listener.KeyRepeated += OnKeyRepeated;
-            listener.KeyReleased += OnKeyReleased;
-        }
-
-        private void BlockEvents(IKeyboardListener listener)
-        {
             listener.KeyPressed -= OnKeyPressed;
             listener.KeyRepeated -= OnKeyRepeated;
             listener.KeyReleased -= OnKeyReleased;

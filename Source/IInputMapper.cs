@@ -3,7 +3,7 @@
 namespace Logos.Input
 {
     /// <summary>
-    /// Represents an event router that invokes event handlers based on mapped input data.
+    /// Represents an event router that notifies input observers based on mapped input gestures.
     /// </summary>
     public interface IInputMapper
     {
@@ -22,7 +22,7 @@ namespace Logos.Input
         /// <paramref name="provider"/> does not contain an input listener requested by the
         /// <see cref="IInputMapper"/>.
         /// </exception>
-        void Connect(IInputProvider provider);
+        void RouteEvents(IInputProvider provider);
 
         /// <summary>
         /// Blocks events exposed by compatible input listeners contained by the specified input
@@ -39,6 +39,6 @@ namespace Logos.Input
         /// <paramref name="provider"/> does not contain an input listener requested by the
         /// <see cref="IInputMapper"/>.
         /// </exception>
-        void Disconnect(IInputProvider provider);
+        void BlockEvents(IInputProvider provider);
     }
 }
