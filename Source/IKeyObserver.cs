@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Logos.Input
+﻿namespace Logos.Input
 {
     /// <summary>
     /// Provides mechanisms for receiving key event data.
