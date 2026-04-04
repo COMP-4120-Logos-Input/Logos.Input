@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Numerics;
-using NUnit.Framework;
 
 namespace Logos.Input.Tests
 {
@@ -12,13 +11,13 @@ namespace Logos.Input.Tests
         public void BindButtonPress_triggers_handler_on_button_press()
         {
             var mapper = new MouseMapper();
-            var device = new FakeMouseDevice();
+            var device = new FakeMouseListener();
             MouseButtonEventArgs? captured = null;
 
             mapper.BindButtonPress(MouseButton.Left, (_, args) => captured = args);
             mapper.Connect(device);
 
-            var input = new MouseButtonEventArgs(MouseButton.Left, timestamp: 7);
+            var input = new MouseButtonEventArgs(null!, TimeSpan.FromTicks(7), MouseButton.Left);
             device.RaiseButtonPressed(input);
 
             Assert.That(captured, Is.EqualTo(input));
@@ -28,13 +27,13 @@ namespace Logos.Input.Tests
         public void BindButtonRelease_triggers_handler_on_button_release()
         {
             var mapper = new MouseMapper();
-            var device = new FakeMouseDevice();
+            var device = new FakeMouseListener();
             MouseButtonEventArgs? captured = null;
 
             mapper.BindButtonRelease(MouseButton.Right, (_, args) => captured = args);
             mapper.Connect(device);
 
-            var input = new MouseButtonEventArgs(MouseButton.Right, timestamp: 13);
+            var input = new MouseButtonEventArgs(null!, TimeSpan.FromTicks(13), MouseButton.Right);
             device.RaiseButtonReleased(input);
 
             Assert.That(captured, Is.EqualTo(input));
@@ -44,14 +43,14 @@ namespace Logos.Input.Tests
         public void BindCursorMotion_triggers_handler_on_cursor_move()
         {
             var mapper = new MouseMapper();
-            var device = new FakeMouseDevice();
+            var device = new FakeMouseListener();
             MouseMotionEventArgs? captured = null;
 
-            mapper.BindCursorMotion((_, args) => captured = args);
+            mapper.BindMouseMove((_, args) => captured = args);
             mapper.Connect(device);
 
-            var input = new MouseMotionEventArgs(new Vector2(10.0f, 20.0f), timestamp: 21);
-            device.RaiseCursorMoved(input);
+            var input = new MouseMotionEventArgs(null!, TimeSpan.FromTicks(21), new Vector2(10.0f, 20.0f));
+            device.RaiseMouseMoved(input);
 
             Assert.That(captured, Is.EqualTo(input));
         }
@@ -60,14 +59,14 @@ namespace Logos.Input.Tests
         public void BindWheelRotation_triggers_handler_on_wheel_roll()
         {
             var mapper = new MouseMapper();
-            var device = new FakeMouseDevice();
+            var device = new FakeMouseListener();
             MouseWheelEventArgs? captured = null;
 
-            mapper.BindWheelRotation((_, args) => captured = args);
+            mapper.BindWheelMove((_, args) => captured = args);
             mapper.Connect(device);
 
-            var input = new MouseWheelEventArgs(new Vector2(1.0f, -1.0f), timestamp: 31);
-            device.RaiseWheelRolled(input);
+            var input = new MouseWheelEventArgs(null!, TimeSpan.FromTicks(31), new Vector2(1.0f, -1.0f));
+            device.RaiseWheelMoved(input);
 
             Assert.That(captured, Is.EqualTo(input));
         }
@@ -76,45 +75,61 @@ namespace Logos.Input.Tests
         public void UnbindCursorMotion_stops_receiving_cursor_events()
         {
             var mapper = new MouseMapper();
-            var device = new FakeMouseDevice();
+            var device = new FakeMouseListener();
             bool called = false;
 
-            mapper.BindCursorMotion((_, _) => called = true);
+            mapper.BindMouseMove((_, _) => called = true);
             mapper.Connect(device);
             mapper.UnbindCursorMotion();
 
-            device.RaiseCursorMoved(new MouseMotionEventArgs(new Vector2(5.0f, 6.0f), timestamp: 2));
+            device.RaiseMouseMoved(new MouseMotionEventArgs(null!, TimeSpan.FromTicks(2), new Vector2(5.0f, 6.0f)));
 
             Assert.That(called, Is.False);
         }
 
-        private sealed class FakeMouseDevice : IMouseDevice
+        private sealed class FakeMouseListener : IMouseListener
         {
-            public bool IsConnected { get; init; } = true;
+            public IEnumerable<IMouseDevice> ConnectedDevices
+            {
+                get => null!;
+            }
 
-            public Vector2 CursorPosition { get; private set; }
+            IEnumerable<IInputDevice> IInputListener.ConnectedDevices
+            {
+                get => null!;
+            }
 
-            public Vector2 WheelRotation { get; private set; }
+            public event EventHandler<InputEventArgs>? DeviceConnected;
+
+            public event EventHandler<InputEventArgs>? DeviceDisconnected;
 
             public event EventHandler<MouseButtonEventArgs>? ButtonPressed;
 
             public event EventHandler<MouseButtonEventArgs>? ButtonReleased;
 
-            public event EventHandler<MouseWheelEventArgs>? WheelRolled;
+            public event EventHandler<MouseMotionEventArgs>? MouseMoved;
 
-            public event EventHandler<MouseMotionEventArgs>? CursorMoved;
+            public event EventHandler<MouseWheelEventArgs>? WheelMoved;
 
-            public bool IsButtonPressed(MouseButton button) => false;
+            public void RaiseButtonPressed(MouseButtonEventArgs args)
+            {
+                ButtonPressed?.Invoke(this, args);
+            }
 
-            public IEnumerable<MouseButton> PressedButtons => Array.Empty<MouseButton>();
+            public void RaiseButtonReleased(MouseButtonEventArgs args)
+            {
+                ButtonReleased?.Invoke(this, args);
+            }
 
-            public void RaiseButtonPressed(MouseButtonEventArgs args) => ButtonPressed?.Invoke(this, args);
+            public void RaiseWheelMoved(MouseWheelEventArgs args)
+            {
+                WheelMoved?.Invoke(this, args);
+            }
 
-            public void RaiseButtonReleased(MouseButtonEventArgs args) => ButtonReleased?.Invoke(this, args);
-
-            public void RaiseWheelRolled(MouseWheelEventArgs args) => WheelRolled?.Invoke(this, args);
-
-            public void RaiseCursorMoved(MouseMotionEventArgs args) => CursorMoved?.Invoke(this, args);
+            public void RaiseMouseMoved(MouseMotionEventArgs args)
+            {
+                MouseMoved?.Invoke(this, args);
+            }
         }
     }
 }

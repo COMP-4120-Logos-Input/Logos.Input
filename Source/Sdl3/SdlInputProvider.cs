@@ -121,12 +121,12 @@ namespace Logos.Input.Sdl3
 
             public void OnKeyDown(in SDL_KeyboardEvent e)
             {
-                _pressedKeys.Add((KeyCode)e.key);
+                _pressedKeys.Add((KeyCode)e.scancode);
             }
 
             public void OnKeyUp(in SDL_KeyboardEvent e)
             {
-                _pressedKeys.Remove((KeyCode)e.key);
+                _pressedKeys.Remove((KeyCode)e.scancode);
             }
         }
 
@@ -223,7 +223,7 @@ namespace Logos.Input.Sdl3
                 if (TryGetValue(e.which, out KeyboardDevice? device))
                 {
                     device.OnKeyDown(in e);
-                    EventHandler<KeyEventArgs>? handler = e.repeat == 0 ? KeyPressed : KeyReleased;
+                    EventHandler<KeyEventArgs>? handler = e.repeat == 0 ? KeyPressed : KeyRepeated;
                     handler?.Invoke(this, CreateEventArgs(device, in e));
                 }
             }
@@ -244,7 +244,7 @@ namespace Logos.Input.Sdl3
 
             private static KeyEventArgs CreateEventArgs(KeyboardDevice device, ref readonly SDL_KeyboardEvent e)
             {
-                return new KeyEventArgs(device, ToTimeSpan(e.timestamp), (KeyCode)e.key);
+                return new KeyEventArgs(device, ToTimeSpan(e.timestamp), (KeyCode)e.scancode);
             }
         }
 

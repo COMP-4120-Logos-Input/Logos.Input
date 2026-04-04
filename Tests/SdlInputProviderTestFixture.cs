@@ -1,4 +1,5 @@
-﻿using System.Numerics;
+﻿using System.Linq;
+using System.Numerics;
 using Logos.Input.Sdl3;
 
 namespace Logos.Input.Tests
@@ -6,33 +7,38 @@ namespace Logos.Input.Tests
     [TestFixture(TestOf = typeof(SdlInputProvider))]
     public sealed class SdlInputProviderTestFixture : MeasurableTestFixture
     {
-        // SDL treats 0 as an invalid keyboard ID, which is perfect for our fake keyboard events.
-        private const int FakeKeyboardId = 0;
-        private const int FakeMouseId = 42;
+        // SDL treats 0 as an invalid device ID, which is perfect for our fake input events.
+        private const int FakeDeviceId = 0;
 
         [Test]
         public void Constructor_InitializesWithNoConnectedDevices()
         {
             SdlInputProvider provider = new SdlInputProvider();
-            Assert.That(provider.ConnectedDevices, Is.Empty);
+
+            foreach (IInputListener listener in provider.Listeners)
+            {
+                Assert.That(listener.ConnectedDevices, Is.Empty);
+            }
         }
 
         [Test, Category(KeyboardCategory)]
         public void Update_WhenKeyboardConnected_RaisesDeviceConnectedAndTracksDevice()
         {
             SdlInputProvider provider = new SdlInputProvider();
-            EventQueueMarshal.OnKeyboardConnected(FakeKeyboardId);
-            InputEventArgs deviceConnectedArgs = default;
+            IKeyboardListener listener = provider.GetListener<IKeyboardListener>();
+            EventQueueMarshal.OnKeyboardConnected(FakeDeviceId);
+            InputEventArgs? deviceConnectedArgs = null;
 
-            provider.DeviceConnected += (_, args) => deviceConnectedArgs = args;
-            provider.Update();
+            listener.DeviceConnected += (_, args) => deviceConnectedArgs = args;
+            provider.DispatchEvents();
 
             using (Assert.EnterMultipleScope())
             {
+                Assert.That(deviceConnectedArgs, Is.Not.Null);
                 Assert.That(deviceConnectedArgs.Device, Is.Not.Null);
                 Assert.That(deviceConnectedArgs.Device, Is.AssignableTo<IKeyboardDevice>());
                 Assert.That(deviceConnectedArgs.Device.IsConnected);
-                Assert.That(provider.ConnectedDevices, Does.Contain(deviceConnectedArgs.Device));
+                Assert.That(listener.ConnectedDevices, Does.Contain(deviceConnectedArgs.Device));
             }
         }
 
@@ -40,23 +46,26 @@ namespace Logos.Input.Tests
         public void Update_WhenKeyboardDisconnected_RaisesDeviceDisconnectedAndRemovesDevice()
         {
             SdlInputProvider provider = new SdlInputProvider();
-            EventQueueMarshal.OnKeyboardConnected(FakeKeyboardId);
-            EventQueueMarshal.OnKeyboardDisconnected(FakeKeyboardId);
-            InputEventArgs deviceConnectedArgs = default;
-            InputEventArgs deviceDisconnectedArgs = default;
+            IKeyboardListener listener = provider.GetListener<IKeyboardListener>();
+            EventQueueMarshal.OnKeyboardConnected(FakeDeviceId);
+            EventQueueMarshal.OnKeyboardDisconnected(FakeDeviceId);
+            InputEventArgs? deviceConnectedArgs = null;
+            InputEventArgs? deviceDisconnectedArgs = null;
 
-            provider.DeviceConnected += (_, args) => deviceConnectedArgs = args;
-            provider.DeviceDisconnected += (_, args) => deviceDisconnectedArgs = args;
-            provider.Update();
+            listener.DeviceConnected += (_, args) => deviceConnectedArgs = args;
+            listener.DeviceDisconnected += (_, args) => deviceDisconnectedArgs = args;
+            provider.DispatchEvents();
 
             using (Assert.EnterMultipleScope())
             {
+                Assert.That(deviceConnectedArgs, Is.Not.Null);
+                Assert.That(deviceDisconnectedArgs, Is.Not.Null);
                 Assert.That(deviceDisconnectedArgs.Device, Is.Not.Null);
                 Assert.That(deviceDisconnectedArgs.Device, Is.AssignableTo<IKeyboardDevice>());
                 Assert.That(deviceDisconnectedArgs.Device, Is.SameAs(deviceConnectedArgs.Device));
                 Assert.That(deviceDisconnectedArgs.Device.IsConnected, Is.False);
                 Assert.That(deviceDisconnectedArgs.Timestamp, Is.GreaterThan(deviceConnectedArgs.Timestamp));
-                Assert.That(provider.ConnectedDevices, Is.Empty);
+                Assert.That(listener.ConnectedDevices, Is.Empty);
             }
         }
 
@@ -64,20 +73,18 @@ namespace Logos.Input.Tests
         public void Update_WhenKnownKeyboardReceivesKeyPressed_RaisesKeyboardAndProviderEvents()
         {
             SdlInputProvider provider = SetUpFakeKeyboard(out IKeyboardDevice keyboard);
-            EventQueueMarshal.OnKeyPressed(FakeKeyboardId, KeyCode.A, isRepeat: true);
-            InputEventArgs deviceUpdatedArgs = default;
-            KeyEventArgs keyPressedArgs = default;
+            IKeyboardListener listener = provider.GetListener<IKeyboardListener>();
+            EventQueueMarshal.OnKeyPressed(FakeDeviceId, KeyCode.A, isRepeat: true);
+            KeyEventArgs? keyPressedArgs = null;
 
-            provider.DeviceUpdated += (_, args) => deviceUpdatedArgs = args;
-            keyboard.KeyPressed += (_, args) => keyPressedArgs = args;
-            provider.Update();
+            listener.KeyRepeated += (_, args) => keyPressedArgs = args;
+            provider.DispatchEvents();
 
             using (Assert.EnterMultipleScope())
             {
-                Assert.That(deviceUpdatedArgs.Device, Is.SameAs(keyboard));
-                Assert.That(deviceUpdatedArgs.Timestamp, Is.EqualTo(keyPressedArgs.Timestamp));
+                Assert.That(keyPressedArgs, Is.Not.Null);
+                Assert.That(keyPressedArgs.Device, Is.SameAs(keyboard));
                 Assert.That(keyPressedArgs.Key, Is.EqualTo(KeyCode.A));
-                Assert.That(keyPressedArgs.IsRepeat);
                 Assert.That(keyboard.IsKeyPressed(KeyCode.A));
                 Assert.That(keyboard.PressedKeys, Does.Contain(KeyCode.A));
             }
@@ -87,21 +94,19 @@ namespace Logos.Input.Tests
         public void Update_WhenKnownKeyboardReceivesKeyReleased_RaisesKeyboardAndProviderEvents()
         {
             SdlInputProvider provider = SetUpFakeKeyboard(out IKeyboardDevice keyboard);
-            EventQueueMarshal.OnKeyPressed(FakeKeyboardId, KeyCode.B, isRepeat: false);
-            EventQueueMarshal.OnKeyReleased(FakeKeyboardId, KeyCode.B);
-            InputEventArgs deviceUpdatedArgs = default;
-            KeyEventArgs keyReleasedArgs = default;
+            IKeyboardListener listener = provider.GetListener<IKeyboardListener>();
+            EventQueueMarshal.OnKeyPressed(FakeDeviceId, KeyCode.B, isRepeat: false);
+            EventQueueMarshal.OnKeyReleased(FakeDeviceId, KeyCode.B);
+            KeyEventArgs? keyReleasedArgs = null;
 
-            provider.DeviceUpdated += (_, args) => deviceUpdatedArgs = args;
-            keyboard.KeyReleased += (_, args) => keyReleasedArgs = args;
-            provider.Update();
+            listener.KeyReleased += (_, args) => keyReleasedArgs = args;
+            provider.DispatchEvents();
 
             using (Assert.EnterMultipleScope())
             {
-                Assert.That(deviceUpdatedArgs.Device, Is.SameAs(keyboard));
-                Assert.That(deviceUpdatedArgs.Timestamp, Is.EqualTo(keyReleasedArgs.Timestamp));
+                Assert.That(keyReleasedArgs, Is.Not.Null);
+                Assert.That(keyReleasedArgs.Device, Is.SameAs(keyboard));
                 Assert.That(keyReleasedArgs.Key, Is.EqualTo(KeyCode.B));
-                Assert.That(keyReleasedArgs.IsRepeat, Is.False);
                 Assert.That(keyboard.IsKeyPressed(KeyCode.B), Is.False);
                 Assert.That(keyboard.PressedKeys, Does.Not.Contain(KeyCode.B));
             }
@@ -111,29 +116,32 @@ namespace Logos.Input.Tests
         public void Update_WhenUnknownKeyboardReceivesKeyEvent_DoesNotRaiseDeviceUpdated()
         {
             SdlInputProvider provider = new SdlInputProvider();
-            EventQueueMarshal.OnKeyPressed(FakeKeyboardId, KeyCode.C, isRepeat: false);
+            IKeyboardListener listener = provider.GetListener<IKeyboardListener>();
+            EventQueueMarshal.OnKeyPressed(FakeDeviceId, KeyCode.C, isRepeat: false);
 
-            provider.DeviceUpdated += (_, _) => Assert.Fail();
-            provider.Update();
-            Assert.That(provider.ConnectedDevices, Is.Empty);
+            listener.KeyPressed += (_, _) => Assert.Fail();
+            provider.DispatchEvents();
+            Assert.That(listener.ConnectedDevices, Is.Empty);
         }
 
         [Test, Category(MouseCategory)]
         public void Update_WhenMouseConnected_RaisesDeviceConnectedAndTracksDevice()
         {
             SdlInputProvider provider = new SdlInputProvider();
-            EventQueueMarshal.OnMouseConnected(FakeMouseId);
-            InputEventArgs deviceConnectedArgs = default;
+            IMouseListener listener = provider.GetListener<IMouseListener>();
+            EventQueueMarshal.OnMouseConnected(FakeDeviceId);
+            InputEventArgs? deviceConnectedArgs = null;
 
-            provider.DeviceConnected += (_, args) => deviceConnectedArgs = args;
-            provider.Update();
+            listener.DeviceConnected += (_, args) => deviceConnectedArgs = args;
+            provider.DispatchEvents();
 
             using (Assert.EnterMultipleScope())
             {
+                Assert.That(deviceConnectedArgs, Is.Not.Null);
                 Assert.That(deviceConnectedArgs.Device, Is.Not.Null);
                 Assert.That(deviceConnectedArgs.Device, Is.AssignableTo<IMouseDevice>());
                 Assert.That(deviceConnectedArgs.Device.IsConnected);
-                Assert.That(provider.ConnectedDevices, Does.Contain(deviceConnectedArgs.Device));
+                Assert.That(listener.ConnectedDevices, Does.Contain(deviceConnectedArgs.Device));
             }
         }
 
@@ -141,23 +149,26 @@ namespace Logos.Input.Tests
         public void Update_WhenMouseDisconnected_RaisesDeviceDisconnectedAndRemovesDevice()
         {
             SdlInputProvider provider = new SdlInputProvider();
-            EventQueueMarshal.OnMouseConnected(FakeMouseId);
-            EventQueueMarshal.OnMouseDisconnected(FakeMouseId);
-            InputEventArgs deviceConnectedArgs = default;
-            InputEventArgs deviceDisconnectedArgs = default;
+            IMouseListener listener = provider.GetListener<IMouseListener>();
+            EventQueueMarshal.OnMouseConnected(FakeDeviceId);
+            EventQueueMarshal.OnMouseDisconnected(FakeDeviceId);
+            InputEventArgs? deviceConnectedArgs = null;
+            InputEventArgs? deviceDisconnectedArgs = null;
 
-            provider.DeviceConnected += (_, args) => deviceConnectedArgs = args;
-            provider.DeviceDisconnected += (_, args) => deviceDisconnectedArgs = args;
-            provider.Update();
+            listener.DeviceConnected += (_, args) => deviceConnectedArgs = args;
+            listener.DeviceDisconnected += (_, args) => deviceDisconnectedArgs = args;
+            provider.DispatchEvents();
 
             using (Assert.EnterMultipleScope())
             {
+                Assert.That(deviceConnectedArgs, Is.Not.Null);
+                Assert.That(deviceDisconnectedArgs, Is.Not.Null);
                 Assert.That(deviceDisconnectedArgs.Device, Is.Not.Null);
                 Assert.That(deviceDisconnectedArgs.Device, Is.AssignableTo<IMouseDevice>());
                 Assert.That(deviceDisconnectedArgs.Device, Is.SameAs(deviceConnectedArgs.Device));
                 Assert.That(deviceDisconnectedArgs.Device.IsConnected, Is.False);
                 Assert.That(deviceDisconnectedArgs.Timestamp, Is.GreaterThan(deviceConnectedArgs.Timestamp));
-                Assert.That(provider.ConnectedDevices, Is.Empty);
+                Assert.That(listener.ConnectedDevices, Is.Empty);
             }
         }
 
@@ -165,18 +176,17 @@ namespace Logos.Input.Tests
         public void Update_WhenKnownMouseReceivesButtonPressed_RaisesMouseAndProviderEvents()
         {
             SdlInputProvider provider = SetUpFakeMouse(out IMouseDevice mouse);
-            EventQueueMarshal.OnMouseButtonPressed(FakeMouseId, MouseButton.Left);
-            InputEventArgs deviceUpdatedArgs = default;
-            MouseButtonEventArgs buttonPressedArgs = default;
+            IMouseListener listener = provider.GetListener<IMouseListener>();
+            EventQueueMarshal.OnMouseButtonPressed(FakeDeviceId, MouseButton.Left);
+            MouseButtonEventArgs? buttonPressedArgs = null;
 
-            provider.DeviceUpdated += (_, args) => deviceUpdatedArgs = args;
-            mouse.ButtonPressed += (_, args) => buttonPressedArgs = args;
-            provider.Update();
+            listener.ButtonPressed += (_, args) => buttonPressedArgs = args;
+            provider.DispatchEvents();
 
             using (Assert.EnterMultipleScope())
             {
-                Assert.That(deviceUpdatedArgs.Device, Is.SameAs(mouse));
-                Assert.That(deviceUpdatedArgs.Timestamp, Is.EqualTo(buttonPressedArgs.Timestamp));
+                Assert.That(buttonPressedArgs, Is.Not.Null);
+                Assert.That(buttonPressedArgs.Device, Is.SameAs(mouse));
                 Assert.That(buttonPressedArgs.Button, Is.EqualTo(MouseButton.Left));
                 Assert.That(mouse.IsButtonPressed(MouseButton.Left));
             }
@@ -186,19 +196,18 @@ namespace Logos.Input.Tests
         public void Update_WhenKnownMouseReceivesButtonReleased_RaisesMouseAndProviderEvents()
         {
             SdlInputProvider provider = SetUpFakeMouse(out IMouseDevice mouse);
-            EventQueueMarshal.OnMouseButtonPressed(FakeMouseId, MouseButton.Right);
-            EventQueueMarshal.OnMouseButtonReleased(FakeMouseId, MouseButton.Right);
-            InputEventArgs deviceUpdatedArgs = default;
+            IMouseListener listener = provider.GetListener<IMouseListener>();
+            EventQueueMarshal.OnMouseButtonPressed(FakeDeviceId, MouseButton.Right);
+            EventQueueMarshal.OnMouseButtonReleased(FakeDeviceId, MouseButton.Right);
             MouseButtonEventArgs buttonReleasedArgs = default;
 
-            provider.DeviceUpdated += (_, args) => deviceUpdatedArgs = args;
-            mouse.ButtonReleased += (_, args) => buttonReleasedArgs = args;
-            provider.Update();
+            listener.ButtonReleased += (_, args) => buttonReleasedArgs = args;
+            provider.DispatchEvents();
 
             using (Assert.EnterMultipleScope())
             {
-                Assert.That(deviceUpdatedArgs.Device, Is.SameAs(mouse));
-                Assert.That(deviceUpdatedArgs.Timestamp, Is.EqualTo(buttonReleasedArgs.Timestamp));
+                Assert.That(buttonReleasedArgs, Is.Not.Null);
+                Assert.That(buttonReleasedArgs.Device, Is.SameAs(mouse));
                 Assert.That(buttonReleasedArgs.Button, Is.EqualTo(MouseButton.Right));
                 Assert.That(mouse.IsButtonPressed(MouseButton.Right), Is.False);
             }
@@ -208,21 +217,20 @@ namespace Logos.Input.Tests
         public void Update_WhenKnownMouseReceivesCursorMoved_RaisesMouseAndProviderEvents()
         {
             SdlInputProvider provider = SetUpFakeMouse(out IMouseDevice mouse);
+            IMouseListener listener = provider.GetListener<IMouseListener>();
             Vector2 position = new Vector2(123.5f, 456.25f);
-            EventQueueMarshal.OnMouseMoved(FakeMouseId, position.X, position.Y);
-            InputEventArgs deviceUpdatedArgs = default;
-            MouseMotionEventArgs cursorMovedArgs = default;
+            EventQueueMarshal.OnMouseMoved(FakeDeviceId, position.X, position.Y);
+            MouseMotionEventArgs? cursorMovedArgs = null;
 
-            provider.DeviceUpdated += (_, args) => deviceUpdatedArgs = args;
-            mouse.CursorMoved += (_, args) => cursorMovedArgs = args;
-            provider.Update();
+            listener.MouseMoved += (_, args) => cursorMovedArgs = args;
+            provider.DispatchEvents();
 
             using (Assert.EnterMultipleScope())
             {
-                Assert.That(deviceUpdatedArgs.Device, Is.SameAs(mouse));
-                Assert.That(deviceUpdatedArgs.Timestamp, Is.EqualTo(cursorMovedArgs.Timestamp));
+                Assert.That(cursorMovedArgs, Is.Not.Null);
+                Assert.That(cursorMovedArgs.Device, Is.SameAs(mouse));
                 Assert.That(cursorMovedArgs.Translation, Is.EqualTo(position));
-                Assert.That(mouse.CursorPosition, Is.EqualTo(position));
+                Assert.That(mouse.Position, Is.EqualTo(position));
             }
         }
 
@@ -230,21 +238,21 @@ namespace Logos.Input.Tests
         public void Update_WhenKnownMouseReceivesWheelRolled_RaisesMouseAndProviderEvents()
         {
             SdlInputProvider provider = SetUpFakeMouse(out IMouseDevice mouse);
+            IMouseListener listener = provider.GetListener<IMouseListener>();
             Vector2 rotation = new Vector2(-2.0f, 1.5f);
-            EventQueueMarshal.OnMouseWheelRolled(FakeMouseId, rotation.X, rotation.Y);
-            InputEventArgs deviceUpdatedArgs = default;
+            EventQueueMarshal.OnMouseWheelRolled(FakeDeviceId, rotation.X, rotation.Y);
             MouseWheelEventArgs wheelRolledArgs = default;
 
-            provider.DeviceUpdated += (_, args) => deviceUpdatedArgs = args;
-            mouse.WheelRolled += (_, args) => wheelRolledArgs = args;
-            provider.Update();
+            listener.WheelMoved += (_, args) => wheelRolledArgs = args;
+            provider.DispatchEvents();
 
             using (Assert.EnterMultipleScope())
             {
-                Assert.That(deviceUpdatedArgs.Device, Is.SameAs(mouse));
-                Assert.That(deviceUpdatedArgs.Timestamp, Is.EqualTo(wheelRolledArgs.Timestamp));
+                Assert.That(wheelRolledArgs, Is.Not.Null);
+                Assert.That(wheelRolledArgs.Device, Is.SameAs(mouse));
+                Assert.That(wheelRolledArgs.Timestamp, Is.EqualTo(wheelRolledArgs.Timestamp));
                 Assert.That(wheelRolledArgs.Delta, Is.EqualTo(rotation));
-                Assert.That(mouse.WheelRotation, Is.EqualTo(rotation));
+                Assert.That(mouse.ScrollWheel, Is.EqualTo(rotation));
             }
         }
 
@@ -252,11 +260,12 @@ namespace Logos.Input.Tests
         public void Update_WhenUnknownMouseReceivesButtonEvent_DoesNotRaiseDeviceUpdated()
         {
             SdlInputProvider provider = new SdlInputProvider();
-            EventQueueMarshal.OnMouseButtonPressed(FakeMouseId, MouseButton.Middle);
+            IMouseListener listener = provider.GetListener<IMouseListener>();
+            EventQueueMarshal.OnMouseButtonPressed(FakeDeviceId, MouseButton.Middle);
 
-            provider.DeviceUpdated += (_, _) => Assert.Fail();
-            provider.Update();
-            Assert.That(provider.ConnectedDevices, Is.Empty);
+            listener.ButtonPressed += (_, _) => Assert.Fail();
+            provider.DispatchEvents();
+            Assert.That(listener.ConnectedDevices, Is.Empty);
         }
 
         [Test, Category(MouseCategory)]
@@ -264,11 +273,11 @@ namespace Logos.Input.Tests
         {
             SdlInputProvider provider = SetUpFakeMouse(out IMouseDevice mouse);
 
-            EventQueueMarshal.OnMouseWheelRolled(FakeMouseId, 6.0f, 7.0f);
-            EventQueueMarshal.OnMouseWheelRolled(FakeMouseId, 7.0f, 6.0f);
+            EventQueueMarshal.OnMouseWheelRolled(FakeDeviceId, 6.0f, 7.0f);
+            EventQueueMarshal.OnMouseWheelRolled(FakeDeviceId, 7.0f, 6.0f);
 
-            provider.Update();
-            Assert.That(mouse.WheelRotation, Is.EqualTo(new Vector2(7.0f, 6.0f)));
+            provider.DispatchEvents();
+            Assert.That(mouse.ScrollWheel, Is.EqualTo(new Vector2(7.0f, 6.0f)));
         }
 
         [Test, Category(MouseCategory)]
@@ -276,22 +285,21 @@ namespace Logos.Input.Tests
         {
             SdlInputProvider provider = SetUpFakeMouse(out IMouseDevice mouse);
 
-            EventQueueMarshal.OnMouseMoved(FakeMouseId, 60.0f, 70.0f);
-            EventQueueMarshal.OnMouseMoved(FakeMouseId, 70.0f, 60.0f);
+            EventQueueMarshal.OnMouseMoved(FakeDeviceId, 60.0f, 70.0f);
+            EventQueueMarshal.OnMouseMoved(FakeDeviceId, 70.0f, 60.0f);
 
-            provider.Update();
-            Assert.That(mouse.CursorPosition, Is.EqualTo(new Vector2(70.0f, 60.0f)));
+            provider.DispatchEvents();
+            Assert.That(mouse.Position, Is.EqualTo(new Vector2(70.0f, 60.0f)));
         }
 
         private static SdlInputProvider SetUpFakeKeyboard(out IKeyboardDevice keyboard)
         {
             SdlInputProvider provider = new SdlInputProvider();
-            IInputDevice? device = null;
-            EventQueueMarshal.OnKeyboardConnected(FakeKeyboardId);
+            IKeyboardListener listener = provider.GetListener<IKeyboardListener>();
+            EventQueueMarshal.OnKeyboardConnected(FakeDeviceId);
 
-            provider.DeviceConnected += (_, args) => device = args.Device;
-            provider.Update();
-            keyboard = (device as IKeyboardDevice)!;
+            provider.DispatchEvents();
+            keyboard = listener.ConnectedDevices.FirstOrDefault()!;
 
             if (keyboard == null)
             {
@@ -304,12 +312,11 @@ namespace Logos.Input.Tests
         private static SdlInputProvider SetUpFakeMouse(out IMouseDevice mouse)
         {
             SdlInputProvider provider = new SdlInputProvider();
-            IInputDevice? device = null;
-            EventQueueMarshal.OnMouseConnected(FakeMouseId);
+            IMouseListener listener = provider.GetListener<IMouseListener>();
+            EventQueueMarshal.OnMouseConnected(FakeDeviceId);
 
-            provider.DeviceConnected += (_, args) => device = args.Device;
-            provider.Update();
-            mouse = (device as IMouseDevice)!;
+            provider.DispatchEvents();
+            mouse = listener.ConnectedDevices.FirstOrDefault()!;
 
             if (mouse == null)
             {

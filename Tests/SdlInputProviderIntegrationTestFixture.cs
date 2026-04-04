@@ -18,7 +18,7 @@ namespace Logos.Input.Tests
 
             SdlInputProvider provider = new SdlInputProvider();
 
-            Assert.DoesNotThrow(provider.Update);
+            Assert.DoesNotThrow(provider.DispatchEvents);
         }
 
         [Test]
@@ -27,15 +27,16 @@ namespace Logos.Input.Tests
             Assume.That(HasVendoredNativeSdl(), Is.True, "Requires a vendored native SDL3 binary for this platform.");
 
             SdlInputProvider provider = new SdlInputProvider();
+            IKeyboardListener listener = provider.GetListener<IKeyboardListener>();
             bool connected = false;
 
-            provider.DeviceConnected += (_, _) => connected = true;
+            listener.DeviceConnected += (_, _) => connected = true;
 
             TestContext.Progress.WriteLine("Connect an external keyboard within 10 seconds.");
 
             bool observed = WaitForEvent(
                 timeout: TimeSpan.FromSeconds(10),
-                onPoll: provider.Update,
+                onPoll: provider.DispatchEvents,
                 isSatisfied: () => connected);
 
             Assert.That(observed, Is.True, "No keyboard connection event was observed within the timeout.");

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using NUnit.Framework;
 
 namespace Logos.Input.Tests
 {
@@ -11,13 +10,13 @@ namespace Logos.Input.Tests
         public void BindKeyPress_triggers_handler_on_repeat_key_event()
         {
             var mapper = new KeyboardMapper();
-            var device = new FakeKeyboardDevice();
+            var device = new FakeKeyboardListener();
             KeyEventArgs? captured = null;
 
             mapper.BindKeyPress(KeyCode.A, (_, args) => captured = args);
             mapper.Connect(device);
 
-            var input = new KeyEventArgs(KeyCode.A, isRepeat: true, timestamp: 42);
+            var input = new KeyEventArgs(null!, TimeSpan.FromTicks(42), KeyCode.A);
             device.RaiseKeyPressed(input);
 
             Assert.That(captured, Is.EqualTo(input));
@@ -27,14 +26,14 @@ namespace Logos.Input.Tests
         public void BindKeyRepeat_triggers_handler_on_non_repeat_key_event()
         {
             var mapper = new KeyboardMapper();
-            var device = new FakeKeyboardDevice();
+            var device = new FakeKeyboardListener();
             KeyEventArgs? captured = null;
 
             mapper.BindKeyRepeat(KeyCode.B, (_, args) => captured = args);
             mapper.Connect(device);
 
-            var input = new KeyEventArgs(KeyCode.B, isRepeat: false, timestamp: 99);
-            device.RaiseKeyPressed(input);
+            var input = new KeyEventArgs(null!, TimeSpan.FromTicks(99), KeyCode.B);
+            device.RaiseKeyRepeated(input);
 
             Assert.That(captured, Is.EqualTo(input));
         }
@@ -43,13 +42,13 @@ namespace Logos.Input.Tests
         public void BindKeyRelease_triggers_handler_on_key_release_event()
         {
             var mapper = new KeyboardMapper();
-            var device = new FakeKeyboardDevice();
+            var device = new FakeKeyboardListener();
             KeyEventArgs? captured = null;
 
             mapper.BindKeyRelease(KeyCode.C, (_, args) => captured = args);
             mapper.Connect(device);
 
-            var input = new KeyEventArgs(KeyCode.C, isRepeat: false, timestamp: 123);
+            var input = new KeyEventArgs(null!, TimeSpan.FromTicks(123), KeyCode.C);
             device.RaiseKeyReleased(input);
 
             Assert.That(captured, Is.EqualTo(input));
@@ -59,33 +58,54 @@ namespace Logos.Input.Tests
         public void Disconnect_stops_receiving_key_events()
         {
             var mapper = new KeyboardMapper();
-            var device = new FakeKeyboardDevice();
+            var device = new FakeKeyboardListener();
             bool called = false;
 
             mapper.BindKeyPress(KeyCode.D, (_, _) => called = true);
             mapper.Connect(device);
             mapper.Disconnect(device);
 
-            device.RaiseKeyPressed(new KeyEventArgs(KeyCode.D, isRepeat: true, timestamp: 1));
+            device.RaiseKeyPressed(new KeyEventArgs(null!, TimeSpan.FromTicks(1), KeyCode.D));
 
             Assert.That(called, Is.False);
         }
 
-        private sealed class FakeKeyboardDevice : IKeyboardDevice
+        private sealed class FakeKeyboardListener : IKeyboardListener
         {
-            public bool IsConnected { get; init; } = true;
+            public IEnumerable<IKeyboardDevice> ConnectedDevices
+            {
+                get => null!;
+            }
+
+            IEnumerable<IInputDevice> IInputListener.ConnectedDevices
+            {
+                get => null!;
+            }
+
+            public event EventHandler<InputEventArgs>? DeviceConnected;
+
+            public event EventHandler<InputEventArgs>? DeviceDisconnected;
 
             public event EventHandler<KeyEventArgs>? KeyPressed;
 
+            public event EventHandler<KeyEventArgs>? KeyRepeated;
+
             public event EventHandler<KeyEventArgs>? KeyReleased;
 
-            public IEnumerable<KeyCode> PressedKeys => Array.Empty<KeyCode>();
+            public void RaiseKeyPressed(KeyEventArgs args)
+            {
+                KeyPressed?.Invoke(this, args);
+            }
 
-            public bool IsKeyPressed(KeyCode key) => false;
+            public void RaiseKeyRepeated(KeyEventArgs args)
+            {
+                KeyRepeated?.Invoke(this, args);
+            }
 
-            public void RaiseKeyPressed(KeyEventArgs args) => KeyPressed?.Invoke(this, args);
-
-            public void RaiseKeyReleased(KeyEventArgs args) => KeyReleased?.Invoke(this, args);
+            public void RaiseKeyReleased(KeyEventArgs args)
+            {
+                KeyReleased?.Invoke(this, args);
+            }
         }
     }
 }
