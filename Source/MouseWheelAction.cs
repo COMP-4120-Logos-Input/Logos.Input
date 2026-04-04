@@ -8,6 +8,6 @@
         ScrollUp,
         ScrollDown,
         ScrollLeft,
-        ScrollRight,
+        ScrollRight
     }
 }
