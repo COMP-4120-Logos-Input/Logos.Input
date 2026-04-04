@@ -6,7 +6,9 @@ namespace Logos.Input
     /// Represents a base class for classes that represent key controls whose states can be changed
     /// by key events.
     /// </summary>
-    /// <typeparam name="T"></typeparam>
+    /// <typeparam name="T">
+    /// The type of the state associated with the <see cref="KeyControl{T}"/>.
+    /// </typeparam>
     public abstract class KeyControl<T> : IInputControl<T>, IKeyObserver
     {
         private T? _state;
