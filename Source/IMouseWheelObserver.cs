@@ -14,6 +14,6 @@
         /// <param name="e">
         /// An object that contains mouse wheel event data.
         /// </param>
-        void OnWheelMoved(object? sender, MouseButtonEventArgs e);
+        void OnWheelMoved(object? sender, MouseWheelEventArgs e);
     }
 }
