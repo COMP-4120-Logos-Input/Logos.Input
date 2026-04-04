@@ -3,78 +3,125 @@ using System.Collections.Generic;
 
 namespace Logos.Input
 {
+    /// <summary>
+    /// Represents an input mapper that routes input events triggered by specific key gestures to
+    /// key observers.
+    /// </summary>
     public class KeyboardMapper : IInputMapper
     {
-        private readonly Dictionary<KeyboardGesture, EventHandler<KeyEventArgs>> _bindings;
+        private readonly Dictionary<KeyGesture, IKeyObserver> _bindings;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="KeyboardMapper"/> class.
+        /// </summary>
         public KeyboardMapper()
         {
-            _bindings = new Dictionary<KeyboardGesture, EventHandler<KeyEventArgs>>();
+            _bindings = new Dictionary<KeyGesture, IKeyObserver>();
         }
 
-        public void BindKeyPress(KeyCode key, EventHandler<KeyEventArgs> handler)
+        /// <summary>
+        /// Routes input events triggered by the specified key gesture to the specified key
+        /// observer.
+        /// </summary>
+        /// <param name="gesture">
+        /// The key gesture to bind.
+        /// </param>
+        /// <param name="observer">
+        /// The key observer that will listen for input events triggered by
+        /// <paramref name="gesture"/>.
+        /// </param>
+        /// <exception cref="ArgumentNullException">
+        /// <paramref name="observer"/> is <see langword="null"/>.
+        /// </exception>
+        public void Bind(KeyGesture gesture, IKeyObserver observer)
         {
-            BindEvent(key, handler, KeyboardEventType.Press);
+            ArgumentNullException.ThrowIfNull(observer);
+            _bindings[gesture] = observer;
         }
 
-        public void BindKeyRepeat(KeyCode key, EventHandler<KeyEventArgs> handler)
+        /// <summary>
+        /// Removes the key observer that was listening for input events triggered by the specified
+        /// key gesture.
+        /// </summary>
+        /// <param name="gesture">
+        /// The key gesture to unbind.
+        /// </param>
+        public void Unbind(KeyGesture gesture)
         {
-            BindEvent(key, handler, KeyboardEventType.Repeat);
+            _bindings.Remove(gesture);
         }
 
-        public void BindKeyRelease(KeyCode key, EventHandler<KeyEventArgs> handler)
-        {
-            BindEvent(key, handler, KeyboardEventType.Release);
-        }
-
-        public void UnbindKeyPress(KeyCode key)
-        {
-            UnbindEvent(key, KeyboardEventType.Press);
-        }
-
-        public void UnbindKeyRepeat(KeyCode key)
-        {
-            UnbindEvent(key, KeyboardEventType.Repeat);
-        }
-
-        public void UnbindKeyRelease(KeyCode key)
-        {
-            UnbindEvent(key, KeyboardEventType.Release);
-        }
-
+        /// <summary>
+        /// Routes events exposed by keyboard listeners contained by the specified input provider
+        /// to the <see cref="KeyboardMapper"/>.
+        /// </summary>
+        /// <param name="provider">
+        /// The input provider containing keyboard listeners whose events can be routed to the
+        /// <see cref="KeyboardMapper"/>.
+        /// </param>
+        /// <exception cref="ArgumentNullException">
+        /// <paramref name="provider"/> is <see langword="null"/>.
+        /// </exception>
+        /// <exception cref="NotSupportedException">
+        /// <paramref name="provider"/> does not contain a keyboard listener.
+        /// </exception>
         public void Connect(IInputProvider provider)
         {
             ArgumentNullException.ThrowIfNull(provider);
             RouteEvents(provider.GetListener<IKeyboardListener>());
         }
 
+        /// <summary>
+        /// Routes events exposed by the specified keyboard listener to the
+        /// <see cref="KeyboardMapper"/>.
+        /// </summary>
+        /// <param name="listener">
+        /// The keyboard listener whose events can be routed to the <see cref="KeyboardMapper"/>.
+        /// </param>
+        /// <exception cref="ArgumentNullException">
+        /// <paramref name="listener"/> is <see langword="null"/>.
+        /// </exception>
         public void Connect(IKeyboardListener listener)
         {
             ArgumentNullException.ThrowIfNull(listener);
             RouteEvents(listener);
         }
 
+        /// <summary>
+        /// Blocks events exposed by keyboard listeners contained by the specified input provider
+        /// from reaching the <see cref="KeyboardMapper"/>.
+        /// </summary>
+        /// <param name="provider">
+        /// The input provider containing keyboard listeners whose events are to be blocked from
+        /// reaching the <see cref="KeyboardMapper"/>.
+        /// </param>
+        /// <exception cref="ArgumentNullException">
+        /// <paramref name="provider"/> is <see langword="null"/>.
+        /// </exception>
+        /// <exception cref="NotSupportedException">
+        /// <paramref name="provider"/> does not contain a keyboard listener.
+        /// </exception>
         public void Disconnect(IInputProvider provider)
         {
             ArgumentNullException.ThrowIfNull(provider);
             BlockEvents(provider.GetListener<IKeyboardListener>());
         }
 
+        /// <summary>
+        /// Blocks events exposed by the specified keyboard listene from reaching the
+        /// <see cref="KeyboardMapper"/>.
+        /// </summary>
+        /// <param name="listener">
+        /// The keyboard listener whose events are to be blocked from reaching the
+        /// <see cref="KeyboardMapper"/>.
+        /// </param>
+        /// <exception cref="ArgumentNullException">
+        /// <paramref name="listener"/> is <see langword="null"/>.
+        /// </exception>
         public void Disconnect(IKeyboardListener listener)
         {
             ArgumentNullException.ThrowIfNull(listener);
             BlockEvents(listener);
-        }
-
-        private void BindEvent(KeyCode key, EventHandler<KeyEventArgs> handler, KeyboardEventType type)
-        {
-            ArgumentNullException.ThrowIfNull(handler);
-            _bindings[new KeyboardGesture(key, type)] = handler;
-        }
-
-        private void UnbindEvent(KeyCode key, KeyboardEventType type)
-        {
-            _bindings.Remove(new KeyboardGesture(key, type));
         }
 
         private void RouteEvents(IKeyboardListener listener)
@@ -93,46 +140,32 @@ namespace Logos.Input
 
         private void OnKeyPressed(object? sender, KeyEventArgs args)
         {
-            InvokeKeyEventHandler(sender, args, KeyboardEventType.Press);
+            KeyGesture gesture = new KeyGesture(args.Key, KeyAction.Press);
+
+            if (_bindings.TryGetValue(gesture, out IKeyObserver? observer))
+            {
+                observer.OnKeyPressed(sender, args);
+            }
         }
 
         private void OnKeyRepeated(object? sender, KeyEventArgs args)
         {
-            InvokeKeyEventHandler(sender, args, KeyboardEventType.Repeat);
+            KeyGesture gesture = new KeyGesture(args.Key, KeyAction.Repeat);
+
+            if (_bindings.TryGetValue(gesture, out IKeyObserver? observer))
+            {
+                observer.OnKeyRepeated(sender, args);
+            }
         }
 
         private void OnKeyReleased(object? sender, KeyEventArgs args)
         {
-            InvokeKeyEventHandler(sender, args, KeyboardEventType.Release);
-        }
+            KeyGesture gesture = new KeyGesture(args.Key, KeyAction.Release);
 
-        private void InvokeKeyEventHandler(object? sender, KeyEventArgs args, KeyboardEventType type)
-        {
-            KeyboardGesture gesture = new KeyboardGesture(args.Key, type);
-
-            if (_bindings.TryGetValue(gesture, out EventHandler<KeyEventArgs>? handler))
+            if (_bindings.TryGetValue(gesture, out IKeyObserver? observer))
             {
-                handler(sender, args);
+                observer.OnKeyReleased(sender, args);
             }
-        }
-
-        private readonly record struct KeyboardGesture
-        {
-            public readonly KeyCode Key;
-            public readonly KeyboardEventType Type;
-
-            public KeyboardGesture(KeyCode key, KeyboardEventType type)
-            {
-                Key = key;
-                Type = type;
-            }
-        }
-
-        private enum KeyboardEventType
-        {
-            Press,
-            Repeat,
-            Release
         }
     }
 }
