@@ -12,9 +12,12 @@ namespace Logos.Input
         /// provider to the <see cref="IInputMapper"/>.
         /// </summary>
         /// <param name="provider">
-        /// The input provider containing input listeners whose events can be routed to the
+        /// The input provider containing input listeners whose events are to be routed to the
         /// <see cref="IInputMapper"/>.
         /// </param>
+        /// <exception cref="ArgumentNullException">
+        /// <paramref name="provider"/> is <see langword="null"/>.
+        /// </exception>
         /// <exception cref="NotSupportedException">
         /// <paramref name="provider"/> does not contain an input listener requested by the
         /// <see cref="IInputMapper"/>.
@@ -26,9 +29,12 @@ namespace Logos.Input
         /// provider from reaching the <see cref="IInputMapper"/>.
         /// </summary>
         /// <param name="provider">
-        /// The input provider containing input listeners whose events are to be blocked from the
-        /// <see cref="IInputMapper"/>.
+        /// The input provider containing input listeners whose events are to be blocked from
+        /// reaching the <see cref="IInputMapper"/>.
         /// </param>
+        /// <exception cref="ArgumentNullException">
+        /// <paramref name="provider"/> is <see langword="null"/>.
+        /// </exception>
         /// <exception cref="NotSupportedException">
         /// <paramref name="provider"/> does not contain an input listener requested by the
         /// <see cref="IInputMapper"/>.
