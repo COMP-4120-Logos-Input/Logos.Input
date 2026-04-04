@@ -1,7 +1,7 @@
 ﻿namespace Logos.Input
 {
     /// <summary>
-    /// Defines a pairing of keys and actions.
+    /// Represents an association between keys and key actions.
     /// </summary>
     public readonly record struct KeyGesture
     {
