@@ -1,14 +1,17 @@
-﻿namespace Logos.Input
+﻿using System;
+
+namespace Logos.Input
 {
     /// <summary>
-    /// Specifies mouse wheel directions.
+    /// Specifies bitflags for mouse wheel directions. 
     /// </summary>
+    [Flags]
     public enum MouseWheelDirection
     {
-        Any,
-        Up,
-        Down,
-        Left,
-        Right
+        Any = 0,
+        Up = 1 << 0,
+        Down = 1 << 1,
+        Left = 1 << 2,
+        Right = 1 << 3
     }
 }
