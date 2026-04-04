@@ -9,12 +9,11 @@ namespace Logos.Input.Sdl3
         static SDL3()
         {
             // Quits SDL when the parent process is about to die.
-            AppDomain.CurrentDomain.ProcessExit += (_, _) => SDL_Quit();
         }
 
         [LibraryImport(nameof(SDL3))]
         [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-        private static partial void SDL_Quit();
+        public static partial void SDL_Quit();
 
         [LibraryImport(nameof(SDL3))]
         [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]

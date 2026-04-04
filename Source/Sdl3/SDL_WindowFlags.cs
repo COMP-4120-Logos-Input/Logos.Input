@@ -3,7 +3,7 @@ using System;
 namespace Logos.Input.Sdl3
 {
     [Flags]
-    internal enum SDL_WindowFlags : ulong
+    public enum SDL_WindowFlags : ulong
     {
         SDL_WINDOW_FULLSCREEN          = 0x0000000000000001,
         SDL_WINDOW_OPENGL              = 0x0000000000000002,
