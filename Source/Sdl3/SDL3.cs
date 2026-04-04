@@ -41,5 +41,13 @@ namespace Logos.Input.Sdl3
         [LibraryImport(nameof(SDL3))]
         [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
         public static partial uint SDL_GetWindowID(nint window);
+        
+        [LibraryImport(nameof(SDL3))]
+        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+        public static partial nint SDL_GetKeyboards(out int count);
+
+        [LibraryImport(nameof(SDL3))]
+        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+        public static partial nint SDL_GetMice(out int count);
     }
 }
