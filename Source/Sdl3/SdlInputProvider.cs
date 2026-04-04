@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Numerics;
 using static Logos.Input.Sdl3.SDL3;
 
@@ -141,14 +140,14 @@ namespace Logos.Input.Sdl3
 
             public bool IsConnected { get; set; }
 
+            public Vector2 Position { get; private set; }
+
+            public Vector2 ScrollWheel { get; private set; }
+
             public IEnumerable<MouseButton> PressedButtons
             {
                 get => _pressedButtons;
             }
-
-            public Vector2 Position { get; private set; }
-
-            public Vector2 ScrollWheel { get; private set; }
 
             public bool IsButtonPressed(MouseButton button)
             {
