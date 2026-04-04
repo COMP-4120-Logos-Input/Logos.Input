@@ -31,5 +31,8 @@ namespace Logos.Input.Sdl3
         
         [FieldOffset(0)]
         public SDL_MouseWheelEvent wheel;
+
+        [FieldOffset(0)] 
+        public SDL_WindowEvent window;
     }
 }
