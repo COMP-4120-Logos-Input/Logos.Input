@@ -7,13 +7,13 @@
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="KeyGesture"/> structure to the specified
-        /// key and action.
+        /// key and key action.
         /// </summary>
         /// <param name="key">
         /// The key associated with the <see cref="KeyGesture"/>.
         /// </param>
         /// <param name="action">
-        /// The action associated with the <see cref="KeyGesture"/>.
+        /// The key action associated with the <see cref="KeyGesture"/>.
         /// </param>
         public KeyGesture(KeyCode key, KeyAction action)
         {
@@ -30,10 +30,10 @@
         public KeyCode Key { get; }
 
         /// <summary>
-        /// Gets the action associated with the <see cref="KeyGesture"/>.
+        /// Gets the key action associated with the <see cref="KeyGesture"/>.
         /// </summary>
         /// <returns>
-        /// The action associated with the <see cref="KeyGesture"/>.
+        /// The key action associated with the <see cref="KeyGesture"/>.
         /// </returns>
         public KeyAction Action { get; }
     }
