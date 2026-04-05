@@ -12,7 +12,7 @@
         /// The source of the event.
         /// </param>
         /// <param name="e">
-        /// An object that contains key event data.
+        /// An object that contains the event data.
         /// </param>
         void OnKeyPressed(object? sender, KeyEventArgs e);
 
@@ -23,7 +23,7 @@
         /// The source of the event.
         /// </param>
         /// <param name="e">
-        /// An object that contains key event data.
+        /// An object that contains the event data.
         /// </param>
         void OnKeyRepeated(object? sender, KeyEventArgs e);
 
@@ -34,7 +34,7 @@
         /// The source of the event.
         /// </param>
         /// <param name="e">
-        /// An object that contains key event data.
+        /// An object that contains the event data.
         /// </param>
         void OnKeyReleased(object? sender, KeyEventArgs e);
     }
