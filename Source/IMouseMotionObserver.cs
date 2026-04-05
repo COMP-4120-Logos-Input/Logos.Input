@@ -6,13 +6,13 @@
     public interface IMouseMotionObserver
     {
         /// <summary>
-        /// Notifies the <see cref="IMouseMotionObserver"/> of a mouse move event.
+        /// Notifies the <see cref="IMouseMotionObserver"/> of a mouse motion event.
         /// </summary>
         /// <param name="sender">
         /// The source of the event.
         /// </param>
         /// <param name="e">
-        /// An object that contains mouse motion event data.
+        /// An object that contains the event data.
         /// </param>
         void OnMouseMoved(object? sender, MouseMotionEventArgs e);
     }
