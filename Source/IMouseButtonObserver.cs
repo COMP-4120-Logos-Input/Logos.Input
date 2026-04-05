@@ -6,24 +6,24 @@
     public interface IMouseButtonObserver
     {
         /// <summary>
-        /// Notifies the <see cref="IMouseButtonObserver"/> of a mouse button press event.
+        /// Notifies the <see cref="IMouseButtonObserver"/> of a button press event.
         /// </summary>
         /// <param name="sender">
         /// The source of the event.
         /// </param>
         /// <param name="e">
-        /// An object that contains mouse button event data.
+        /// An object that contains the event data.
         /// </param>
         void OnButtonPressed(object? sender, MouseButtonEventArgs e);
 
         /// <summary>
-        /// Notifies the <see cref="IMouseButtonObserver"/> of a mouse button release event.
+        /// Notifies the <see cref="IMouseButtonObserver"/> of a button release event.
         /// </summary>
         /// <param name="sender">
         /// The source of the event.
         /// </param>
         /// <param name="e">
-        /// An object that contains mouse button event data.
+        /// An object that contains the event data.
         /// </param>
         void OnButtonReleased(object? sender, MouseButtonEventArgs e);
     }
