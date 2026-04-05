@@ -3,7 +3,7 @@
 namespace Logos.Input
 {
     /// <summary>
-    /// Specifies bitflags for mouse wheel directions. 
+    /// Specifies bitflags for mouse wheel scroll directions.
     /// </summary>
     [Flags]
     public enum MouseWheelDirection
