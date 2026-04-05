@@ -1,5 +1,8 @@
 ﻿namespace Logos.Input
 {
+	/// <summary>
+	/// Specifies codes corresponding to physical keys on a keyboard.
+	/// </summary>
     public enum KeyCode
     {
         None = 0x00,
