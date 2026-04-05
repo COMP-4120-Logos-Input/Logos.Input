@@ -1,7 +1,7 @@
 ﻿namespace Logos.Input
 {
     /// <summary>
-    /// Represents a base class for classes that implement mouse button controls whose states can be
+    /// Represents a base class for classes that implement mouse button controls whose state can be
     /// changed by mouse button events.
     /// </summary>
     /// <typeparam name="T">

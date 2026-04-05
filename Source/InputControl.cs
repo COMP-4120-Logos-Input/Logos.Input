@@ -3,8 +3,8 @@
 namespace Logos.Input
 {
     /// <summary>
-    /// Represents a base class for classes that implement input controls whose states can be
-    /// changed by input events.
+    /// Represents a base class for classes that implement input controls whose state can be changed
+    /// by input events.
     /// </summary>
     /// <typeparam name="T">
     /// The type of the state held by the <see cref="InputControl{T}"/>.

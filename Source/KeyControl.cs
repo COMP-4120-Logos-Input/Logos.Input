@@ -1,7 +1,7 @@
 ﻿namespace Logos.Input
 {
     /// <summary>
-    /// Represents a base class for classes that implement key controls whose states can be changed
+    /// Represents a base class for classes that implement key controls whose state can be changed
     /// by key events.
     /// </summary>
     /// <typeparam name="T">
