@@ -13,13 +13,13 @@ namespace Logos.Input
         /// by the specified mouse button.
         /// </summary>
         /// <param name="device">
-        /// The mouse device that sent the input event.
+        /// The mouse device that sent the event data.
         /// </param>
         /// <param name="timestamp">
-        /// The time at which the input event occured.
+        /// The time at which the event occured.
         /// </param>
         /// <param name="button">
-        /// The mouse button that triggered the input event.
+        /// The mouse button that triggered the event.
         /// </param>
         public MouseButtonEventArgs(IMouseDevice device, TimeSpan timestamp, MouseButton button) : base(device, timestamp)
         {
@@ -38,10 +38,10 @@ namespace Logos.Input
         }
 
         /// <summary>
-        /// Gets the mouse button that triggered the input event.
+        /// Gets the mouse button that triggered the event.
         /// </summary>
         /// <returns>
-        /// The mouse button that triggered the input event.
+        /// The mouse button that triggered the event.
         /// </returns>
         public MouseButton Button { get; }
     }
