@@ -1,5 +1,8 @@
 ﻿namespace Logos.Input
 {
+    /// <summary>
+    /// Specifies mouse buttons.
+    /// </summary>
     public enum MouseButton
     {
         None,
