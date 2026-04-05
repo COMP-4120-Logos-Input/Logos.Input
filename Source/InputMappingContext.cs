@@ -26,8 +26,9 @@ namespace Logos.Input
         /// The collection of input mappers to route events to.
         /// </param>
         /// <exception cref="ArgumentNullException">
-        /// <paramref name="provider"/> is <see langword="null"/> -or-
-        /// <paramref name="mappers"/> is <see langword="null"/>
+        /// <paramref name="provider"/> is <see langword="null"/>. -or-
+        /// <paramref name="mappers"/> is <see langword="null"/>. -or-
+        /// One or more elements of <paramref name="mappers"/> is <see langword="null"/>.
         /// </exception>
         public InputMappingContext(IInputProvider provider, IEnumerable<IInputMapper> mappers)
         {
@@ -74,8 +75,12 @@ namespace Logos.Input
         }
 
         /// <summary>
-        /// Routes events for all input mappers contained by the <see cref="InputMappingContext"/>.
+        /// Routes events from <see cref="Provider"/> to all the input mappers contained by the
+        /// <see cref="InputMappingContext"/>.
         /// </summary>
+        /// <exception cref="NotSupportedException">
+        /// An input mapper failed to obtain a required input listener from <see cref="Provider"/>.
+        /// </exception>
         public void Enable()
         {
             if (!_isEnabled)
@@ -90,8 +95,12 @@ namespace Logos.Input
         }
 
         /// <summary>
-        /// Blocks events for all input mappers contained by the <see cref="InputMappingContext"/>.
+        /// Blocks events routed from <see cref="Provider"/> from reaching any of the input mappers
+        /// contained by the <see cref="InputMappingContext"/>.
         /// </summary>
+        /// <exception cref="NotSupportedException">
+        /// An input mapper failed to obtain a required input listener from <see cref="Provider"/>.
+        /// </exception>
         public void Disable()
         {
             if (_isEnabled)
