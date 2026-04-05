@@ -251,7 +251,7 @@ namespace Logos.Input.Tests
                 Assert.That(wheelRolledArgs, Is.Not.Null);
                 Assert.That(wheelRolledArgs.Device, Is.SameAs(mouse));
                 Assert.That(wheelRolledArgs.Timestamp, Is.EqualTo(wheelRolledArgs.Timestamp));
-                Assert.That(wheelRolledArgs.Delta, Is.EqualTo(rotation));
+                Assert.That(wheelRolledArgs.Scroll, Is.EqualTo(rotation));
                 Assert.That(mouse.ScrollWheel, Is.EqualTo(rotation));
             }
         }

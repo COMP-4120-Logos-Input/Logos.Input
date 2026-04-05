@@ -19,12 +19,12 @@ namespace Logos.Input
         /// <param name="timestamp">
         /// The time at which the input event occured.
         /// </param>
-        /// <param name="delta">
+        /// <param name="scroll">
         /// The change in the scroll wheel's value on <paramref name="device"/>.
         /// </param>
-        public MouseWheelEventArgs(IMouseDevice device, TimeSpan timestamp, Vector2 delta) : base(device, timestamp)
+        public MouseWheelEventArgs(IMouseDevice device, TimeSpan timestamp, Vector2 scroll) : base(device, timestamp)
         {
-            Delta = delta;
+            Scroll = scroll;
         }
 
         /// <summary>
@@ -46,6 +46,6 @@ namespace Logos.Input
         /// The change in the scroll wheel's value on <see cref="Device"/> when the input event
         /// occured.
         /// </returns>
-        public Vector2 Delta { get; }
+        public Vector2 Scroll { get; }
     }
 }

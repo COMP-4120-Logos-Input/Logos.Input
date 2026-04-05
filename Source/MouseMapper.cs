@@ -245,7 +245,7 @@ namespace Logos.Input
                 observer.OnWheelMoved(sender, args);
             }
 
-            MouseWheelDirection direction = (MouseWheelDirection)GetDirection(args.Delta);
+            MouseWheelDirection direction = (MouseWheelDirection)GetDirection(args.Scroll);
 
             if (direction != 0 && _wheelBindings.TryGetValue(direction, out observer))
             {
