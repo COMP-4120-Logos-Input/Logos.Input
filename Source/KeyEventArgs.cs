@@ -13,13 +13,13 @@ namespace Logos.Input
         /// the specified key.
         /// </summary>
         /// <param name="device">
-        /// The keyboard device that sent the input event.
+        /// The keyboard device that sent the event data.
         /// </param>
         /// <param name="timestamp">
-        /// The time at which the input event occured.
+        /// The time at which the event occured.
         /// </param>
         /// <param name="key">
-        /// The key that triggered the input event.
+        /// The key that triggered the event.
         /// </param>
         public KeyEventArgs(IKeyboardDevice device, TimeSpan timestamp, KeyCode key) : base(device, timestamp)
         {
@@ -38,10 +38,10 @@ namespace Logos.Input
         }
 
         /// <summary>
-        /// Gets the key that triggered the input event.
+        /// Gets the key that triggered the event.
         /// </summary>
         /// <returns>
-        /// The key that triggered the input event.
+        /// The key that triggered the event.
         /// </returns>
         public KeyCode Key { get; }
     }

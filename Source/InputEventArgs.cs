@@ -15,7 +15,7 @@ namespace Logos.Input
         /// The input device that sent the event data.
         /// </param>
         /// <param name="timestamp">
-        /// The time at which the input event occured.
+        /// The time at which the event occured.
         /// </param>
         public InputEventArgs(IInputDevice device, TimeSpan timestamp)
         {
@@ -32,10 +32,10 @@ namespace Logos.Input
         public IInputDevice Device { get; }
 
         /// <summary>
-        /// Gets the time at which the input event occured.
+        /// Gets the time at which the event occured.
         /// </summary>
         /// <returns>
-        /// The time at which the input event occured.
+        /// The time at which the event occured.
         /// </returns>
         public TimeSpan Timestamp { get; }
     }
