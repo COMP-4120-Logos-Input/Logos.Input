@@ -1,14 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Numerics;
+using System.Runtime.InteropServices;
 using static Logos.Input.Sdl3.SDL3;
 
 namespace Logos.Input.Sdl3
 {
-    public sealed class SdlInputProvider : IInputProvider
+    public sealed class SdlInputProvider : IInputProvider, IDisposable
     {
         private readonly ObservableKeyboardDeviceCollection _keyboards;
         private readonly ObservableMouseDeviceCollection _mice;
+        private readonly Dictionary<uint, SdlWindow> _windows;
+        
+        public void RegisterWindow(SdlWindow window) => _windows[window.Id] = window;
+        public void UnregisterWindow(SdlWindow window) => _windows.Remove(window.Id);
 
         static SdlInputProvider()
         {
@@ -23,6 +28,25 @@ namespace Logos.Input.Sdl3
         {
             _keyboards = new ObservableKeyboardDeviceCollection();
             _mice = new ObservableMouseDeviceCollection();
+            _windows = new Dictionary<uint, SdlWindow>();
+            
+            nint keyboardIds = SDL_GetKeyboards(out int keyboardCount);
+            for (int i = 0; i < keyboardCount; i++)
+            {
+                uint id = (uint)Marshal.ReadInt32(keyboardIds, i * sizeof(int));
+                KeyboardDevice device = new KeyboardDevice { IsConnected = true };
+                _keyboards.Add(id, device);
+            }
+            SDL_free(keyboardIds);
+            
+            nint mouseIds = SDL_GetMice(out int mouseCount);
+            for (int i = 0; i < mouseCount; i++)
+            {
+                uint id = (uint)Marshal.ReadInt32(mouseIds, i * sizeof(int));
+                MouseDevice device = new MouseDevice { IsConnected = true };
+                _mice.Add(id, device);
+            }
+            SDL_free(mouseIds);
         }
 
         public IEnumerable<IInputListener> Listeners
@@ -34,6 +58,17 @@ namespace Logos.Input.Sdl3
             }
         }
 
+        private bool _disposed;
+
+        public void Dispose()
+        {
+            if (_disposed)
+                return;
+            _disposed = true;
+            SDL_Quit();
+
+        }
+        
         public T GetListener<T>() where T : IInputListener
         {
             if (_keyboards is T keyboardListener)
@@ -86,12 +121,18 @@ namespace Logos.Input.Sdl3
                     case SDL_EventType.SDL_EVENT_MOUSE_WHEEL:
                         _mice.OnMouseWheel(in e.wheel);
                         continue;
+                    case SDL_EventType.SDL_EVENT_WINDOW_CLOSE_REQUESTED:
+                        if (_windows.TryGetValue(e.window.windowID, out SdlWindow? w))
+                            w.OnWindowEvent(in e.window);
+                        continue;
                     default:
                         continue;
                 }
             }
         }
 
+
+        
         private static TimeSpan ToTimeSpan(ulong timestamp)
         {
             return new TimeSpan((long)(timestamp / TimeSpan.NanosecondsPerTick));
@@ -296,7 +337,7 @@ namespace Logos.Input.Sdl3
                 if (TryGetValue(e.which, out MouseDevice? mouse))
                 {
                     mouse.OnMouseButtonDown(in e);
-                    ButtonPressed?.Invoke(this, CreateEventArgs(mouse, in e));
+                    ButtonPressed?.Invoke(this, CreateEventArgs(mouse, in e));     
                 }
             }
 
@@ -305,8 +346,9 @@ namespace Logos.Input.Sdl3
                 if (TryGetValue(e.which, out MouseDevice? mouse))
                 {
                     mouse.OnMouseButtonUp(in e);
-                    ButtonReleased?.Invoke(this, CreateEventArgs(mouse, in e));
+                    ButtonReleased?.Invoke(this, CreateEventArgs(mouse, in e));                    
                 }
+
             }
 
             public void OnMouseMotion(ref readonly SDL_MouseMotionEvent e)
@@ -316,17 +358,17 @@ namespace Logos.Input.Sdl3
                     mouse.OnMouseMotion(in e);
                     MouseMoved?.Invoke(this, CreateEventArgs(mouse, in e));
                 }
+
             }
 
             public void OnMouseWheel(ref readonly SDL_MouseWheelEvent e)
             {
-                // This event does not handle flipped wheels well, which is a property of
-                // SDL_MouseWheelEvent. However, it should be trivial to handle it.
                 if (TryGetValue(e.which, out MouseDevice? mouse))
                 {
                     mouse.OnMouseWheel(in e);
                     WheelMoved?.Invoke(this, CreateEventArgs(mouse, in e));
                 }
+
             }
 
             private static InputEventArgs CreateEventArgs(MouseDevice device, ref readonly SDL_MouseDeviceEvent e)

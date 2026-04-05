@@ -8,13 +8,12 @@ namespace Logos.Input.Sdl3
     {
         static SDL3()
         {
-            // Quits SDL when the parent process is about to die.
-            AppDomain.CurrentDomain.ProcessExit += (_, _) => SDL_Quit();
+
         }
 
         [LibraryImport(nameof(SDL3))]
         [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-        private static partial void SDL_Quit();
+        public static partial void SDL_Quit();
 
         [LibraryImport(nameof(SDL3))]
         [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
@@ -30,5 +29,29 @@ namespace Logos.Input.Sdl3
         [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
         [return: MarshalAs(UnmanagedType.U1)]
         public static partial bool SDL_PushEvent(ref SDL_Event e);
+        
+        [LibraryImport(nameof(SDL3), StringMarshalling = StringMarshalling.Utf8)]
+        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+        public static partial nint SDL_CreateWindow(string title, int w, int h, SDL_WindowFlags flags);
+
+        [LibraryImport(nameof(SDL3))]
+        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+        public static partial void SDL_DestroyWindow(nint window);
+
+        [LibraryImport(nameof(SDL3))]
+        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+        public static partial uint SDL_GetWindowID(nint window);
+        
+        [LibraryImport(nameof(SDL3))]
+        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+        public static partial nint SDL_GetKeyboards(out int count);
+
+        [LibraryImport(nameof(SDL3))]
+        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+        public static partial nint SDL_GetMice(out int count);
+        
+        [LibraryImport(nameof(SDL3))]
+        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+        public static partial void SDL_free(nint mem);
     }
 }

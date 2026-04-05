@@ -1,4 +1,5 @@
 <Solution>
   <Project Path="Source/Logos.Input.csproj" />
+  <Project Path="TestProgram/TestProgram.csproj" />
   <Project Path="Tests/Logos.Input.Tests.csproj" />
 </Solution>
