@@ -3,7 +3,7 @@
 namespace Logos.Input
 {
     /// <summary>
-    /// Defines methods that query the state of a keyboard device.
+    /// Defines methods that access the state of a keyboard device.
     /// </summary>
     public interface IKeyboardDevice : IInputDevice
     {
