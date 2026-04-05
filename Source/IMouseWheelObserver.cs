@@ -6,13 +6,13 @@
     public interface IMouseWheelObserver
     {
         /// <summary>
-        /// Notifies the <see cref="IMouseWheelObserver"/> of a mouse wheel move event.
+        /// Notifies the <see cref="IMouseWheelObserver"/> of a mouse wheel event.
         /// </summary>
         /// <param name="sender">
         /// The source of the event.
         /// </param>
         /// <param name="e">
-        /// An object that contains mouse wheel event data.
+        /// An object that contains the event data.
         /// </param>
         void OnWheelMoved(object? sender, MouseWheelEventArgs e);
     }
