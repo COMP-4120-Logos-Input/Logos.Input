@@ -33,7 +33,7 @@ namespace Logos.Input
         event EventHandler<MouseMotionEventArgs> MouseMoved;
 
         /// <summary>
-        /// Occurs when a scroll wheel is rolled on a mouse device.
+        /// Occurs when a scroll wheel is moved on a mouse device.
         /// </summary>
         event EventHandler<MouseWheelEventArgs> WheelMoved;
     }
