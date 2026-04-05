@@ -3,8 +3,8 @@
 namespace Logos.Input
 {
     /// <summary>
-    /// Represents a base class for classes that represent input controls whose states can be changed
-    /// by input events.
+    /// Represents a base class for classes that implement input controls whose states can be
+    /// changed by input events.
     /// </summary>
     /// <typeparam name="T">
     /// The type of the state associated with the <see cref="InputControl{T}"/>.
@@ -25,7 +25,7 @@ namespace Logos.Input
         }
 
         /// <summary>
-        /// Occurs when <see cref="State"/> is updated.
+        /// Occurs when the state of the <see cref="InputControl{T}"/> is changed.
         /// </summary>
         public event EventHandler<T>? StateChanged;
 
@@ -33,7 +33,7 @@ namespace Logos.Input
         /// Notifies the <see cref="InputControl{T}"/> of a change to its state.
         /// </summary>
         /// <param name="state">
-        /// The new state.
+        /// The new state of the <see cref="InputControl{T}"/>.
         /// </param>
         protected void OnStateChanged(T state)
         {
