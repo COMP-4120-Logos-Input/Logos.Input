@@ -1,11 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Numerics;
 
 namespace Logos.Input
 {
     /// <summary>
-    /// Defines methods that query the state of a mouse device.
+    /// Defines methods that access the state of a mouse device.
     /// </summary>
     public interface IMouseDevice : IInputDevice
     {
@@ -18,10 +17,10 @@ namespace Logos.Input
         Vector2 Position { get; }
 
         /// <summary>
-        /// Gets the value of the scroll wheel on the <see cref="IMouseDevice"/>.
+        /// Gets the scroll wheel value of the <see cref="IMouseDevice"/>.
         /// </summary>
         /// <returns>
-        /// The value of the scroll wheel on the <see cref="IMouseDevice"/>.
+        /// The scroll wheel value of the <see cref="IMouseDevice"/>.
         /// </returns>
         Vector2 ScrollWheel { get; }
 
