@@ -17,12 +17,12 @@ namespace Logos.Input.Tests
              *        this one, I suggest creating a KeyGesture that associates the A key with the
              *        key press action, and assigning the gesture to a child of the KeyControl<bool>
              *        class through the mapper's Bind() method. When overriding the KeyControl<bool>
-             *        subclass' OnKeyPressed() method, you can set its State property to true by
-             *        passing the value to the OnStateChanged() method. You can then check its State
-             *        property via an assert to see if it was set through the event. You can imagine
-             *        that you'd have to do something similar for each of the broken tests. Feel
-             *        free to remove comments like this when you get the tests to pass. - Roberto
-             * 
+             *        subclass' OnKeyPressed() method, you can set its State property to true from
+             *        the child class. You can then check its State property via an assert to see if
+             *        it was set through the event. You can imagine that you'd have to do something
+             *        similar for each of the broken tests. Feel free to remove comments like this
+             *        when you get the tests to pass. - Roberto
+             *
              * mapper.BindKeyPress(KeyCode.A, (_, args) => captured = args);
              */
             mapper.RouteEvents(device);

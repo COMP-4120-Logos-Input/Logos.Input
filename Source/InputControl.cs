@@ -14,31 +14,47 @@ namespace Logos.Input
         private T? _state;
 
         /// <summary>
-        /// Gets the state of the <see cref="InputControl{T}"/>.
+        /// Initializes a new instance of the <see cref="InputControl{T}"/> class to the default
+        /// state.
         /// </summary>
+        protected InputControl()
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="InputControl{T}"/> class to the specified
+        /// state.
+        /// </summary>
+        /// <param name="state">
+        /// The initial state of the <see cref="InputControl{T}"/>.
+        /// </param>
+        protected InputControl(T state)
+        {
+            _state = state;
+        }
+
+        /// <summary>
+        /// Gets or sets the state of the <see cref="InputControl{T}"/>.
+        /// </summary>
+        /// <param name="value">
+        /// The new state of the <see cref="InputControl{T}"/>.
+        /// </param>
         /// <returns>
         /// The state of the <see cref="InputControl{T}"/>.
         /// </returns>
         public T State
         {
             get => _state!;
+            protected set
+            {
+                _state = value;
+                StateChanged?.Invoke(this, value);
+            }
         }
 
         /// <summary>
         /// Occurs when the state of the <see cref="InputControl{T}"/> is changed.
         /// </summary>
         public event EventHandler<T>? StateChanged;
-
-        /// <summary>
-        /// Notifies the <see cref="InputControl{T}"/> of a change to its state.
-        /// </summary>
-        /// <param name="state">
-        /// The new state of the <see cref="InputControl{T}"/>.
-        /// </param>
-        protected void OnStateChanged(T state)
-        {
-            _state = state;
-            StateChanged?.Invoke(this, state);
-        }
     }
 }
