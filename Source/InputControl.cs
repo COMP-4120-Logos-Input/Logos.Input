@@ -7,7 +7,7 @@ namespace Logos.Input
     /// changed by input events.
     /// </summary>
     /// <typeparam name="T">
-    /// The type of the state associated with the <see cref="InputControl{T}"/>.
+    /// The type of the state held by the <see cref="InputControl{T}"/>.
     /// </typeparam>
     public abstract class InputControl<T>
     {
