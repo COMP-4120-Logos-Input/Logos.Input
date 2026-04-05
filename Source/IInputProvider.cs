@@ -9,10 +9,10 @@ namespace Logos.Input
     public interface IInputProvider
     {
         /// <summary>
-        /// Returns a collection of supported input listeners.
+        /// Returns a collection of input listeners contained by the <see cref="IInputProvider"/>.
         /// </summary>
         /// <returns>
-        /// A collection of supported input listeners.
+        /// A collection of input listeners contained by the <see cref="IInputProvider"/>.
         /// </returns>
         IEnumerable<IInputListener> Listeners { get; }
 
