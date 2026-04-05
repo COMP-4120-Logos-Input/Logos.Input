@@ -37,15 +37,16 @@ namespace Logos.Input
         public InputMappingContext(IInputProvider provider, IEnumerable<IInputMapper> mappers)
         {
             ArgumentNullException.ThrowIfNull(provider);
-            _provider = provider;
-            _mappers = mappers.ToArray();
+            IInputMapper[] array = mappers.ToArray();
 
-            foreach (IInputMapper mapper in _mappers)
+            foreach (IInputMapper mapper in array)
             {
                 ArgumentNullException.ThrowIfNull(mapper);
-                mapper.RouteEvents(_provider);
+                mapper.RouteEvents(provider);
             }
 
+            _provider = provider;
+            _mappers = array;
             _isEnabled = true;
         }
 
