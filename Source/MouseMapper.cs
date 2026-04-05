@@ -6,7 +6,7 @@ namespace Logos.Input
 {
     /// <summary>
     /// Represents an input mapper that routes input events triggered by specific mouse gestures to
-    /// mouse observers.
+    /// mapped mouse observers.
     /// </summary>
     public class MouseMapper : IInputMapper
     {
@@ -106,7 +106,7 @@ namespace Logos.Input
         /// motion in the specified direction.
         /// </summary>
         /// <param name="direction">
-        /// The mouse wheel motion direction to unbind.
+        /// The mouse motion direction to unbind.
         /// </param>
         public void Unbind(MouseMotionDirection direction)
         {
@@ -126,8 +126,8 @@ namespace Logos.Input
         }
 
         /// <summary>
-        /// Routes events exposed by a mouse listener contained by the specified input provider to
-        /// the <see cref="MouseMapper"/>.
+        /// Routes events exposed by a mouse listener from the specified input provider to the
+        /// <see cref="MouseMapper"/>.
         /// </summary>
         /// <param name="provider">
         /// The input provider containing a mouse listener whose events are to be routed to the
@@ -164,8 +164,8 @@ namespace Logos.Input
         }
 
         /// <summary>
-        /// Blocks events exposed by a mouse listener contained by the specified input provider
-        /// from reaching the <see cref="MouseMapper"/>.
+        /// Blocks events exposed by a mouse listener from the specified input provider from
+        /// reaching the <see cref="MouseMapper"/>.
         /// </summary>
         /// <param name="provider">
         /// The input provider containing a mouse listener whose events are to be blocked from
@@ -230,9 +230,9 @@ namespace Logos.Input
                 observer.OnMouseMoved(sender, args);
             }
 
-            MouseMotionDirection direction = (MouseMotionDirection)ToDirectionFlags(args.Translation);
+            MouseMotionDirection direction = (MouseMotionDirection)GetDirection(args.Translation);
 
-            if (direction != MouseMotionDirection.Any && _motionBindings.TryGetValue(direction, out observer))
+            if (direction != 0 && _motionBindings.TryGetValue(direction, out observer))
             {
                 observer.OnMouseMoved(sender, args);
             }
@@ -245,15 +245,15 @@ namespace Logos.Input
                 observer.OnWheelMoved(sender, args);
             }
 
-            MouseWheelDirection direction = (MouseWheelDirection)ToDirectionFlags(args.Delta);
+            MouseWheelDirection direction = (MouseWheelDirection)GetDirection(args.Delta);
 
-            if (direction != MouseWheelDirection.Any && _wheelBindings.TryGetValue(direction, out observer))
+            if (direction != 0 && _wheelBindings.TryGetValue(direction, out observer))
             {
                 observer.OnWheelMoved(sender, args);
             }
         }
 
-        private static int ToDirectionFlags(Vector2 direction)
+        private static int GetDirection(Vector2 direction)
         {
             int flags = 0;
 
