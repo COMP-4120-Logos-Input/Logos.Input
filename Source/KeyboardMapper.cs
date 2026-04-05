@@ -5,7 +5,7 @@ namespace Logos.Input
 {
     /// <summary>
     /// Represents an input mapper that routes input events triggered by specific key gestures to
-    /// key observers.
+    /// mapped key observers.
     /// </summary>
     public class KeyboardMapper : IInputMapper
     {
@@ -52,8 +52,8 @@ namespace Logos.Input
         }
 
         /// <summary>
-        /// Routes events exposed by a keyboard listener contained by the specified input provider
-        /// to the <see cref="KeyboardMapper"/>.
+        /// Routes events exposed by a keyboard listener from the specified input provider to the
+        /// <see cref="KeyboardMapper"/>.
         /// </summary>
         /// <param name="provider">
         /// The input provider containing a keyboard listener whose events are to be routed to the
@@ -90,8 +90,8 @@ namespace Logos.Input
         }
 
         /// <summary>
-        /// Blocks events exposed by a keyboard listener contained by the specified input provider
-        /// from reaching the <see cref="KeyboardMapper"/>.
+        /// Blocks events exposed by a keyboard listener from the specified input provider from
+        /// reaching the <see cref="KeyboardMapper"/>.
         /// </summary>
         /// <param name="provider">
         /// The input provider containing a keyboard listener whose events are to be blocked from
