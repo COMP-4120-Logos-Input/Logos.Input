@@ -25,10 +25,17 @@ namespace Logos.Input.Sdl3
 
         public unsafe SdlInputProvider()
         {
-            _keyboards = new ObservableKeyboardDeviceCollection();
-            _mice = new ObservableMouseDeviceCollection();
-            _windows = new Dictionary<uint, SdlWindow>();
             nint keyboardIds = SDL_GetKeyboards(out int keyboardCount);
+            nint mouseIds = SDL_GetMice(out int mouseCount);
+            _keyboards = new ObservableKeyboardDeviceCollection(keyboardCount + 1)
+            {
+                { 0, new KeyboardDevice { IsConnected = true } }
+            };
+            _mice = new ObservableMouseDeviceCollection(mouseCount + 1)
+            {
+                { 0, new MouseDevice { IsConnected = true } }
+            };
+            _windows = new Dictionary<uint, SdlWindow>();
 
             foreach (uint id in new ReadOnlySpan<uint>(keyboardIds.ToPointer(), keyboardCount))
             {
@@ -36,15 +43,13 @@ namespace Logos.Input.Sdl3
                 _keyboards.Add(id, device);
             }
 
-            SDL_free(keyboardIds);
-            nint mouseIds = SDL_GetMice(out int mouseCount);
-
             foreach (uint id in new ReadOnlySpan<uint>(mouseIds.ToPointer(), mouseCount))
             {
                 MouseDevice device = new MouseDevice { IsConnected = true };
                 _mice.Add(id, device);
             }
 
+            SDL_free(keyboardIds);
             SDL_free(mouseIds);
         }
 
@@ -129,8 +134,6 @@ namespace Logos.Input.Sdl3
                 }
             }
         }
-
-
 
         private static TimeSpan GetTimeSpan(ulong timestamp)
         {
@@ -217,6 +220,10 @@ namespace Logos.Input.Sdl3
 
         private sealed class ObservableKeyboardDeviceCollection : Dictionary<uint, KeyboardDevice>, IKeyboardListener
         {
+            public ObservableKeyboardDeviceCollection(int capacity) : base(capacity)
+            {
+            }
+
             public IEnumerable<IKeyboardDevice> ConnectedDevices
             {
                 get => Values;
@@ -289,6 +296,10 @@ namespace Logos.Input.Sdl3
 
         private sealed class ObservableMouseDeviceCollection : Dictionary<uint, MouseDevice>, IMouseListener
         {
+            public ObservableMouseDeviceCollection(int capacity) : base(capacity)
+            {
+            }
+
             public IEnumerable<IMouseDevice> ConnectedDevices
             {
                 get => Values;

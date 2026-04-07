@@ -4,7 +4,7 @@
     {
         SDL_EVENT_FIRST = 0,
         SDL_EVENT_QUIT = 0x100,
-        
+
         // Window events
         SDL_EVENT_WINDOW_SHOWN              = 0x202,
         SDL_EVENT_WINDOW_HIDDEN             = 0x203,
@@ -31,7 +31,7 @@
         SDL_EVENT_WINDOW_LEAVE_FULLSCREEN   = 0x218,
         SDL_EVENT_WINDOW_DESTROYED          = 0x219,
         SDL_EVENT_WINDOW_HDR_STATE_CHANGED  = 0x21A,
-        
+
         // Keyboard Events
         SDL_EVENT_KEY_DOWN = 0x300,
         SDL_EVENT_KEY_UP,
@@ -40,11 +40,11 @@
         SDL_EVENT_KEYBOARD_REMOVED,
 
         // Mouse Events
-        SDL_EVENT_MOUSE_MOTION,  // 0x400 according to the SDL docs
+        SDL_EVENT_MOUSE_MOTION = 0x400,
         SDL_EVENT_MOUSE_BUTTON_DOWN,
         SDL_EVENT_MOUSE_BUTTON_UP,
         SDL_EVENT_MOUSE_WHEEL,
         SDL_EVENT_MOUSE_ADDED,
-        SDL_EVENT_MOUSE_REMOVED,
+        SDL_EVENT_MOUSE_REMOVED
     }
 }
