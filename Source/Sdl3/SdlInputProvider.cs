@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Numerics;
-using System.Runtime.InteropServices;
 using static Logos.Input.Sdl3.SDL3;
 
 namespace Logos.Input.Sdl3
@@ -24,28 +23,28 @@ namespace Logos.Input.Sdl3
             }
         }
 
-        public SdlInputProvider()
+        public unsafe SdlInputProvider()
         {
             _keyboards = new ObservableKeyboardDeviceCollection();
             _mice = new ObservableMouseDeviceCollection();
             _windows = new Dictionary<uint, SdlWindow>();
-
             nint keyboardIds = SDL_GetKeyboards(out int keyboardCount);
-            for (int i = 0; i < keyboardCount; i++)
+
+            foreach (uint id in new ReadOnlySpan<uint>(keyboardIds.ToPointer(), keyboardCount))
             {
-                uint id = (uint)Marshal.ReadInt32(keyboardIds, i * sizeof(int));
-                KeyboardDevice device = new KeyboardDevice { IsConnected = true };
+                KeyboardDevice device = new KeyboardDevice{ IsConnected = true };
                 _keyboards.Add(id, device);
             }
-            SDL_free(keyboardIds);
 
+            SDL_free(keyboardIds);
             nint mouseIds = SDL_GetMice(out int mouseCount);
-            for (int i = 0; i < mouseCount; i++)
+
+            foreach (uint id in new ReadOnlySpan<uint>(mouseIds.ToPointer(), mouseCount))
             {
-                uint id = (uint)Marshal.ReadInt32(mouseIds, i * sizeof(int));
                 MouseDevice device = new MouseDevice { IsConnected = true };
                 _mice.Add(id, device);
             }
+
             SDL_free(mouseIds);
         }
 
@@ -348,7 +347,6 @@ namespace Logos.Input.Sdl3
                     mouse.OnMouseButtonUp(in e);
                     ButtonReleased?.Invoke(this, CreateEventArgs(mouse, in e));
                 }
-
             }
 
             public void OnMouseMotion(ref readonly SDL_MouseMotionEvent e)
@@ -358,7 +356,6 @@ namespace Logos.Input.Sdl3
                     mouse.OnMouseMotion(in e);
                     MouseMoved?.Invoke(this, CreateEventArgs(mouse, in e));
                 }
-
             }
 
             public void OnMouseWheel(ref readonly SDL_MouseWheelEvent e)
@@ -368,7 +365,6 @@ namespace Logos.Input.Sdl3
                     mouse.OnMouseWheel(in e);
                     WheelMoved?.Invoke(this, CreateEventArgs(mouse, in e));
                 }
-
             }
 
             private static InputEventArgs CreateEventArgs(MouseDevice device, ref readonly SDL_MouseDeviceEvent e)
@@ -383,7 +379,7 @@ namespace Logos.Input.Sdl3
 
             private static MouseMotionEventArgs CreateEventArgs(MouseDevice device, ref readonly SDL_MouseMotionEvent e)
             {
-                return new MouseMotionEventArgs(device, GetTimeSpan(e.timestamp), new Vector2(e.x, e.y));
+                return new MouseMotionEventArgs(device, GetTimeSpan(e.timestamp), new Vector2(e.xrel, e.yrel));
             }
 
             private static MouseWheelEventArgs CreateEventArgs(MouseDevice device, ref readonly SDL_MouseWheelEvent e)
