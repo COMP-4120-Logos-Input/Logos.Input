@@ -12,21 +12,19 @@ namespace Logos.Input.Tests
         {
             var mapper = new MouseMapper();
             var device = new FakeMouseListener();
-            MouseButtonEventArgs? captured = null;
-            
-            /* FIXME: Please refer to my comment within the BindKeyPress_triggers_handler_on_repeat_key_event()
-             *        method under the KeyboardMapperTestFixture class for guidance on how to fix
-             *        this test. - Roberto
-             *
-             * mapper.BindButtonPress(MouseButton.Left, (_, args) => captured = args);
-             */
-            
+            var control = new MouseButtonControlSpy();
+
+            mapper.Bind(new MouseButtonGesture(MouseButton.Left, MouseButtonAction.Press), control);
             mapper.RouteEvents(device);
 
             var input = new MouseButtonEventArgs(null!, TimeSpan.FromTicks(7), MouseButton.Left);
             device.RaiseButtonPressed(input);
 
-            Assert.That(captured, Is.EqualTo(input));
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(control.WasTriggered, Is.True);
+                Assert.That(control.LastEventArgs, Is.EqualTo(input));
+            }
         }
 
         [Test, Category(MouseCategory)]
@@ -34,21 +32,19 @@ namespace Logos.Input.Tests
         {
             var mapper = new MouseMapper();
             var device = new FakeMouseListener();
-            MouseButtonEventArgs? captured = null;
+            var control = new MouseButtonControlSpy();
 
-            /* FIXME: Please refer to my comment within the BindKeyPress_triggers_handler_on_repeat_key_event()
-             *        method under the KeyboardMapperTestFixture class for guidance on how to fix
-             *        this test. - Roberto
-             *
-             * mapper.BindButtonRelease(MouseButton.Right, (_, args) => captured = args);
-             */
-
+            mapper.Bind(new MouseButtonGesture(MouseButton.Right, MouseButtonAction.Release), control);
             mapper.RouteEvents(device);
 
             var input = new MouseButtonEventArgs(null!, TimeSpan.FromTicks(13), MouseButton.Right);
             device.RaiseButtonReleased(input);
 
-            Assert.That(captured, Is.EqualTo(input));
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(control.WasTriggered, Is.True);
+                Assert.That(control.LastEventArgs, Is.EqualTo(input));
+            }
         }
 
         [Test, Category(MouseCategory)]
@@ -56,21 +52,19 @@ namespace Logos.Input.Tests
         {
             var mapper = new MouseMapper();
             var device = new FakeMouseListener();
-            MouseMotionEventArgs? captured = null;
+            var control = new MouseMotionControlSpy();
 
-            /* FIXME: Please refer to my comment within the BindKeyPress_triggers_handler_on_repeat_key_event()
-             *        method under the KeyboardMapperTestFixture class for guidance on how to fix
-             *        this test. - Roberto
-             *
-             * mapper.BindMouseMove((_, args) => captured = args);
-             */
-
+            mapper.Bind(MouseMotionDirection.Any, control);
             mapper.RouteEvents(device);
 
             var input = new MouseMotionEventArgs(null!, TimeSpan.FromTicks(21), new Vector2(10.0f, 20.0f));
             device.RaiseMouseMoved(input);
 
-            Assert.That(captured, Is.EqualTo(input));
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(control.WasTriggered, Is.True);
+                Assert.That(control.LastEventArgs, Is.EqualTo(input));
+            }
         }
 
         [Test, Category(MouseCategory)]
@@ -78,21 +72,19 @@ namespace Logos.Input.Tests
         {
             var mapper = new MouseMapper();
             var device = new FakeMouseListener();
-            MouseWheelEventArgs? captured = null;
+            var control = new MouseWheelControlSpy();
 
-            /* FIXME: Please refer to my comment within the BindKeyPress_triggers_handler_on_repeat_key_event()
-             *        method under the KeyboardMapperTestFixture class for guidance on how to fix
-             *        this test. - Roberto
-             * 
-             * mapper.BindWheelMove((_, args) => captured = args);
-             */
-
+            mapper.Bind(MouseWheelDirection.Any, control);
             mapper.RouteEvents(device);
 
             var input = new MouseWheelEventArgs(null!, TimeSpan.FromTicks(31), new Vector2(1.0f, -1.0f));
             device.RaiseWheelMoved(input);
 
-            Assert.That(captured, Is.EqualTo(input));
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(control.WasTriggered, Is.True);
+                Assert.That(control.LastEventArgs, Is.EqualTo(input));
+            }
         }
 
         [Test, Category(MouseCategory)]
@@ -100,27 +92,18 @@ namespace Logos.Input.Tests
         {
             var mapper = new MouseMapper();
             var device = new FakeMouseListener();
-            bool called = false;
+            var control = new MouseMotionControlSpy();
 
-            /* FIXME: Please refer to my comment within the BindKeyPress_triggers_handler_on_repeat_key_event()
-             *        method under the KeyboardMapperTestFixture class for guidance on how to fix
-             *        this test. - Roberto
-             * 
-             * mapper.BindMouseMove((_, _) => called = true);
-             */
-            
+            mapper.Bind(MouseMotionDirection.Any, control);
             mapper.RouteEvents(device);
-
-            /* FIXME: Same goes for this part of the test.
-             * 
-             * mapper.UnbindCursorMotion();
-             */
+            mapper.BlockEvents(device);
 
             device.RaiseMouseMoved(new MouseMotionEventArgs(null!, TimeSpan.FromTicks(2), new Vector2(5.0f, 6.0f)));
 
-            Assert.That(called, Is.False);
+            Assert.That(control.WasTriggered, Is.False);
         }
 
+#pragma warning disable CS0067
         private sealed class FakeMouseListener : IMouseListener
         {
             public IEnumerable<IMouseDevice> ConnectedDevices
@@ -163,6 +146,68 @@ namespace Logos.Input.Tests
             public void RaiseMouseMoved(MouseMotionEventArgs args)
             {
                 MouseMoved?.Invoke(this, args);
+            }
+        }
+#pragma warning restore CS0067
+
+        // Simple test helpers that remember if a mouse event reached them.
+        private sealed class MouseButtonControlSpy : MouseButtonControl<bool>
+        {
+            public MouseButtonControlSpy()
+            {
+                State = false;
+            }
+
+            public bool WasTriggered => State;
+
+            public MouseButtonEventArgs? LastEventArgs { get; private set; }
+
+            public override void OnButtonPressed(object? sender, MouseButtonEventArgs e)
+            {
+                LastEventArgs = e;
+                State = true;
+            }
+
+            public override void OnButtonReleased(object? sender, MouseButtonEventArgs e)
+            {
+                LastEventArgs = e;
+                State = true;
+            }
+        }
+
+        private sealed class MouseMotionControlSpy : MouseMotionControl<bool>
+        {
+            public MouseMotionControlSpy()
+            {
+                State = false;
+            }
+
+            public bool WasTriggered => State;
+
+            public MouseMotionEventArgs? LastEventArgs { get; private set; }
+
+            public override void OnMouseMoved(object? sender, MouseMotionEventArgs e)
+            {
+                LastEventArgs = e;
+                State = true;
+            }
+        }
+
+        private sealed class MouseWheelControlSpy : MouseWheelControl<bool>
+        {
+            public MouseWheelControlSpy()
+            {
+                State = false;
+            }
+
+            public bool WasTriggered => State;
+
+            public MouseWheelEventArgs? LastEventArgs { get; private set; }
+
+            public override void OnWheelMoved(object? sender, MouseWheelEventArgs e)
+            {
+                LastEventArgs = e;
+                State = true;
             }
         }
     }

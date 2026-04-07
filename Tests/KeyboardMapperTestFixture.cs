@@ -11,26 +11,19 @@ namespace Logos.Input.Tests
         {
             var mapper = new KeyboardMapper();
             var device = new FakeKeyboardListener();
-            KeyEventArgs? captured = null;
+            var control = new KeyControlSpy();
 
-            /* FIXME: Several lines in the tests will not compile without some modifications. For
-             *        this one, I suggest creating a KeyGesture that associates the A key with the
-             *        key press action, and assigning the gesture to a child of the KeyControl<bool>
-             *        class through the mapper's Bind() method. When overriding the KeyControl<bool>
-             *        subclass' OnKeyPressed() method, you can set its State property to true from
-             *        the child class. You can then check its State property via an assert to see if
-             *        it was set through the event. You can imagine that you'd have to do something
-             *        similar for each of the broken tests. Feel free to remove comments like this
-             *        when you get the tests to pass. - Roberto
-             *
-             * mapper.BindKeyPress(KeyCode.A, (_, args) => captured = args);
-             */
+            mapper.Bind(new KeyGesture(KeyCode.A, KeyAction.Press), control);
             mapper.RouteEvents(device);
 
             var input = new KeyEventArgs(null!, TimeSpan.FromTicks(42), KeyCode.A);
             device.RaiseKeyPressed(input);
 
-            Assert.That(captured, Is.EqualTo(input));
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(control.WasTriggered, Is.True);
+                Assert.That(control.LastEventArgs, Is.EqualTo(input));
+            }
         }
 
         [Test, Category(KeyboardCategory)]
@@ -38,20 +31,19 @@ namespace Logos.Input.Tests
         {
             var mapper = new KeyboardMapper();
             var device = new FakeKeyboardListener();
-            KeyEventArgs? captured = null;
+            var control = new KeyControlSpy();
 
-            /* FIXME: Please refer to my comment within the BindKeyPress_triggers_handler_on_repeat_key_event()
-             *        method under the KeyboardMapperTestFixture class for guidance on how to fix
-             *        this test. - Roberto
-             *
-             * mapper.BindKeyRepeat(KeyCode.B, (_, args) => captured = args);
-             */
+            mapper.Bind(new KeyGesture(KeyCode.B, KeyAction.Repeat), control);
             mapper.RouteEvents(device);
 
             var input = new KeyEventArgs(null!, TimeSpan.FromTicks(99), KeyCode.B);
             device.RaiseKeyRepeated(input);
 
-            Assert.That(captured, Is.EqualTo(input));
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(control.WasTriggered, Is.True);
+                Assert.That(control.LastEventArgs, Is.EqualTo(input));
+            }
         }
 
         [Test, Category(KeyboardCategory)]
@@ -59,20 +51,19 @@ namespace Logos.Input.Tests
         {
             var mapper = new KeyboardMapper();
             var device = new FakeKeyboardListener();
-            KeyEventArgs? captured = null;
+            var control = new KeyControlSpy();
 
-            /* FIXME: Please refer to my comment within the BindKeyPress_triggers_handler_on_repeat_key_event()
-             *        method under the KeyboardMapperTestFixture class for guidance on how to fix
-             *        this test. - Roberto
-             *
-             * mapper.BindKeyRelease(KeyCode.C, (_, args) => captured = args);
-             */
+            mapper.Bind(new KeyGesture(KeyCode.C, KeyAction.Release), control);
             mapper.RouteEvents(device);
 
             var input = new KeyEventArgs(null!, TimeSpan.FromTicks(123), KeyCode.C);
             device.RaiseKeyReleased(input);
 
-            Assert.That(captured, Is.EqualTo(input));
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(control.WasTriggered, Is.True);
+                Assert.That(control.LastEventArgs, Is.EqualTo(input));
+            }
         }
 
         [Test, Category(KeyboardCategory)]
@@ -80,23 +71,18 @@ namespace Logos.Input.Tests
         {
             var mapper = new KeyboardMapper();
             var device = new FakeKeyboardListener();
-            bool called = false;
+            var control = new KeyControlSpy();
 
-            /* FIXME: Please refer to my comment within the BindKeyPress_triggers_handler_on_repeat_key_event()
-             *        method under the KeyboardMapperTestFixture class for guidance on how to fix
-             *        this test. - Roberto
-             *
-             * mapper.BindKeyPress(KeyCode.D, (_, _) => called = true);
-             */
-
+            mapper.Bind(new KeyGesture(KeyCode.D, KeyAction.Press), control);
             mapper.RouteEvents(device);
             mapper.BlockEvents(device);
 
             device.RaiseKeyPressed(new KeyEventArgs(null!, TimeSpan.FromTicks(1), KeyCode.D));
 
-            Assert.That(called, Is.False);
+            Assert.That(control.WasTriggered, Is.False);
         }
 
+#pragma warning disable CS0067
         private sealed class FakeKeyboardListener : IKeyboardListener
         {
             public IEnumerable<IKeyboardDevice> ConnectedDevices
@@ -132,6 +118,38 @@ namespace Logos.Input.Tests
             public void RaiseKeyReleased(KeyEventArgs args)
             {
                 KeyReleased?.Invoke(this, args);
+            }
+        }
+#pragma warning restore CS0067
+
+        // Simple test helper that remembers if a key event reached it.
+        private sealed class KeyControlSpy : KeyControl<bool>
+        {
+            public KeyControlSpy()
+            {
+                State = false;
+            }
+
+            public bool WasTriggered => State;
+
+            public KeyEventArgs? LastEventArgs { get; private set; }
+
+            public override void OnKeyPressed(object? sender, KeyEventArgs e)
+            {
+                LastEventArgs = e;
+                State = true;
+            }
+
+            public override void OnKeyRepeated(object? sender, KeyEventArgs e)
+            {
+                LastEventArgs = e;
+                State = true;
+            }
+
+            public override void OnKeyReleased(object? sender, KeyEventArgs e)
+            {
+                LastEventArgs = e;
+                State = true;
             }
         }
     }

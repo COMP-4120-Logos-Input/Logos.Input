@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Numerics;
 using Logos.Input.Sdl3;
 
@@ -11,13 +12,15 @@ namespace Logos.Input.Tests
         private const int FakeDeviceId = 0;
 
         [Test]
-        public void Constructor_InitializesWithNoConnectedDevices()
+        public void Constructor_InitializesSupportedListeners()
         {
             SdlInputProvider provider = new SdlInputProvider();
 
-            foreach (IInputListener listener in provider.Listeners)
+            using (Assert.EnterMultipleScope())
             {
-                Assert.That(listener.ConnectedDevices, Is.Empty);
+                Assert.That(provider.Listeners.Count(), Is.EqualTo(2));
+                Assert.That(provider.GetListener<IKeyboardListener>(), Is.Not.Null);
+                Assert.That(provider.GetListener<IMouseListener>(), Is.Not.Null);
             }
         }
 
@@ -26,11 +29,18 @@ namespace Logos.Input.Tests
         {
             SdlInputProvider provider = new SdlInputProvider();
             IKeyboardListener listener = provider.GetListener<IKeyboardListener>();
+            IKeyboardDevice[] baselineDevices = listener.ConnectedDevices.ToArray();
             EventQueueMarshal.OnKeyboardConnected(FakeDeviceId);
             InputEventArgs? deviceConnectedArgs = null;
 
             listener.DeviceConnected += (_, args) => deviceConnectedArgs = args;
             provider.DispatchEvents();
+            IKeyboardDevice[] connectedDevices = listener.ConnectedDevices.ToArray();
+
+            if (deviceConnectedArgs is null)
+            {
+                throw new AssertionException("Expected a keyboard connection event.");
+            }
 
             using (Assert.EnterMultipleScope())
             {
@@ -38,7 +48,8 @@ namespace Logos.Input.Tests
                 Assert.That(deviceConnectedArgs.Device, Is.Not.Null);
                 Assert.That(deviceConnectedArgs.Device, Is.AssignableTo<IKeyboardDevice>());
                 Assert.That(deviceConnectedArgs.Device.IsConnected);
-                Assert.That(listener.ConnectedDevices, Does.Contain(deviceConnectedArgs.Device));
+                Assert.That(connectedDevices, Does.Contain(deviceConnectedArgs.Device));
+                Assert.That(connectedDevices.Length, Is.EqualTo(baselineDevices.Length + 1));
             }
         }
 
@@ -47,6 +58,7 @@ namespace Logos.Input.Tests
         {
             SdlInputProvider provider = new SdlInputProvider();
             IKeyboardListener listener = provider.GetListener<IKeyboardListener>();
+            IKeyboardDevice[] baselineDevices = listener.ConnectedDevices.ToArray();
             EventQueueMarshal.OnKeyboardConnected(FakeDeviceId);
             EventQueueMarshal.OnKeyboardDisconnected(FakeDeviceId);
             InputEventArgs? deviceConnectedArgs = null;
@@ -55,6 +67,12 @@ namespace Logos.Input.Tests
             listener.DeviceConnected += (_, args) => deviceConnectedArgs = args;
             listener.DeviceDisconnected += (_, args) => deviceDisconnectedArgs = args;
             provider.DispatchEvents();
+            IKeyboardDevice[] connectedDevices = listener.ConnectedDevices.ToArray();
+
+            if (deviceConnectedArgs is null || deviceDisconnectedArgs is null)
+            {
+                throw new AssertionException("Expected keyboard connection and disconnection events.");
+            }
 
             using (Assert.EnterMultipleScope())
             {
@@ -65,7 +83,7 @@ namespace Logos.Input.Tests
                 Assert.That(deviceDisconnectedArgs.Device, Is.SameAs(deviceConnectedArgs.Device));
                 Assert.That(deviceDisconnectedArgs.Device.IsConnected, Is.False);
                 Assert.That(deviceDisconnectedArgs.Timestamp, Is.GreaterThan(deviceConnectedArgs.Timestamp));
-                Assert.That(listener.ConnectedDevices, Is.Empty);
+                Assert.That(connectedDevices, Is.EquivalentTo(baselineDevices));
             }
         }
 
@@ -79,6 +97,11 @@ namespace Logos.Input.Tests
 
             listener.KeyRepeated += (_, args) => keyPressedArgs = args;
             provider.DispatchEvents();
+
+            if (keyPressedArgs is null)
+            {
+                throw new AssertionException("Expected a repeated key event.");
+            }
 
             using (Assert.EnterMultipleScope())
             {
@@ -102,6 +125,11 @@ namespace Logos.Input.Tests
             listener.KeyReleased += (_, args) => keyReleasedArgs = args;
             provider.DispatchEvents();
 
+            if (keyReleasedArgs is null)
+            {
+                throw new AssertionException("Expected a key release event.");
+            }
+
             using (Assert.EnterMultipleScope())
             {
                 Assert.That(keyReleasedArgs, Is.Not.Null);
@@ -117,11 +145,12 @@ namespace Logos.Input.Tests
         {
             SdlInputProvider provider = new SdlInputProvider();
             IKeyboardListener listener = provider.GetListener<IKeyboardListener>();
+            IKeyboardDevice[] baselineDevices = listener.ConnectedDevices.ToArray();
             EventQueueMarshal.OnKeyPressed(FakeDeviceId, KeyCode.C, isRepeat: false);
 
             listener.KeyPressed += (_, _) => Assert.Fail();
             provider.DispatchEvents();
-            Assert.That(listener.ConnectedDevices, Is.Empty);
+            Assert.That(listener.ConnectedDevices, Is.EquivalentTo(baselineDevices));
         }
 
         [Test, Category(MouseCategory)]
@@ -129,11 +158,18 @@ namespace Logos.Input.Tests
         {
             SdlInputProvider provider = new SdlInputProvider();
             IMouseListener listener = provider.GetListener<IMouseListener>();
+            IMouseDevice[] baselineDevices = listener.ConnectedDevices.ToArray();
             EventQueueMarshal.OnMouseConnected(FakeDeviceId);
             InputEventArgs? deviceConnectedArgs = null;
 
             listener.DeviceConnected += (_, args) => deviceConnectedArgs = args;
             provider.DispatchEvents();
+            IMouseDevice[] connectedDevices = listener.ConnectedDevices.ToArray();
+
+            if (deviceConnectedArgs is null)
+            {
+                throw new AssertionException("Expected a mouse connection event.");
+            }
 
             using (Assert.EnterMultipleScope())
             {
@@ -141,7 +177,8 @@ namespace Logos.Input.Tests
                 Assert.That(deviceConnectedArgs.Device, Is.Not.Null);
                 Assert.That(deviceConnectedArgs.Device, Is.AssignableTo<IMouseDevice>());
                 Assert.That(deviceConnectedArgs.Device.IsConnected);
-                Assert.That(listener.ConnectedDevices, Does.Contain(deviceConnectedArgs.Device));
+                Assert.That(connectedDevices, Does.Contain(deviceConnectedArgs.Device));
+                Assert.That(connectedDevices.Length, Is.EqualTo(baselineDevices.Length + 1));
             }
         }
 
@@ -150,6 +187,7 @@ namespace Logos.Input.Tests
         {
             SdlInputProvider provider = new SdlInputProvider();
             IMouseListener listener = provider.GetListener<IMouseListener>();
+            IMouseDevice[] baselineDevices = listener.ConnectedDevices.ToArray();
             EventQueueMarshal.OnMouseConnected(FakeDeviceId);
             EventQueueMarshal.OnMouseDisconnected(FakeDeviceId);
             InputEventArgs? deviceConnectedArgs = null;
@@ -158,6 +196,12 @@ namespace Logos.Input.Tests
             listener.DeviceConnected += (_, args) => deviceConnectedArgs = args;
             listener.DeviceDisconnected += (_, args) => deviceDisconnectedArgs = args;
             provider.DispatchEvents();
+            IMouseDevice[] connectedDevices = listener.ConnectedDevices.ToArray();
+
+            if (deviceConnectedArgs is null || deviceDisconnectedArgs is null)
+            {
+                throw new AssertionException("Expected mouse connection and disconnection events.");
+            }
 
             using (Assert.EnterMultipleScope())
             {
@@ -168,7 +212,7 @@ namespace Logos.Input.Tests
                 Assert.That(deviceDisconnectedArgs.Device, Is.SameAs(deviceConnectedArgs.Device));
                 Assert.That(deviceDisconnectedArgs.Device.IsConnected, Is.False);
                 Assert.That(deviceDisconnectedArgs.Timestamp, Is.GreaterThan(deviceConnectedArgs.Timestamp));
-                Assert.That(listener.ConnectedDevices, Is.Empty);
+                Assert.That(connectedDevices, Is.EquivalentTo(baselineDevices));
             }
         }
 
@@ -182,6 +226,11 @@ namespace Logos.Input.Tests
 
             listener.ButtonPressed += (_, args) => buttonPressedArgs = args;
             provider.DispatchEvents();
+
+            if (buttonPressedArgs is null)
+            {
+                throw new AssertionException("Expected a mouse button press event.");
+            }
 
             using (Assert.EnterMultipleScope())
             {
@@ -199,10 +248,15 @@ namespace Logos.Input.Tests
             IMouseListener listener = provider.GetListener<IMouseListener>();
             EventQueueMarshal.OnMouseButtonPressed(FakeDeviceId, MouseButton.Right);
             EventQueueMarshal.OnMouseButtonReleased(FakeDeviceId, MouseButton.Right);
-            MouseButtonEventArgs buttonReleasedArgs = default;
+            MouseButtonEventArgs? buttonReleasedArgs = null;
 
             listener.ButtonReleased += (_, args) => buttonReleasedArgs = args;
             provider.DispatchEvents();
+
+            if (buttonReleasedArgs is null)
+            {
+                throw new AssertionException("Expected a mouse button release event.");
+            }
 
             using (Assert.EnterMultipleScope())
             {
@@ -225,6 +279,11 @@ namespace Logos.Input.Tests
             listener.MouseMoved += (_, args) => cursorMovedArgs = args;
             provider.DispatchEvents();
 
+            if (cursorMovedArgs is null)
+            {
+                throw new AssertionException("Expected a mouse move event.");
+            }
+
             using (Assert.EnterMultipleScope())
             {
                 Assert.That(cursorMovedArgs, Is.Not.Null);
@@ -241,16 +300,21 @@ namespace Logos.Input.Tests
             IMouseListener listener = provider.GetListener<IMouseListener>();
             Vector2 rotation = new Vector2(-2.0f, 1.5f);
             EventQueueMarshal.OnMouseWheelRolled(FakeDeviceId, rotation.X, rotation.Y);
-            MouseWheelEventArgs wheelRolledArgs = default;
+            MouseWheelEventArgs? wheelRolledArgs = null;
 
             listener.WheelMoved += (_, args) => wheelRolledArgs = args;
             provider.DispatchEvents();
+
+            if (wheelRolledArgs is null)
+            {
+                throw new AssertionException("Expected a mouse wheel event.");
+            }
 
             using (Assert.EnterMultipleScope())
             {
                 Assert.That(wheelRolledArgs, Is.Not.Null);
                 Assert.That(wheelRolledArgs.Device, Is.SameAs(mouse));
-                Assert.That(wheelRolledArgs.Timestamp, Is.EqualTo(wheelRolledArgs.Timestamp));
+                Assert.That(wheelRolledArgs.Timestamp, Is.GreaterThan(TimeSpan.Zero));
                 Assert.That(wheelRolledArgs.Scroll, Is.EqualTo(rotation));
                 Assert.That(mouse.ScrollWheel, Is.EqualTo(rotation));
             }
@@ -261,11 +325,12 @@ namespace Logos.Input.Tests
         {
             SdlInputProvider provider = new SdlInputProvider();
             IMouseListener listener = provider.GetListener<IMouseListener>();
+            IMouseDevice[] baselineDevices = listener.ConnectedDevices.ToArray();
             EventQueueMarshal.OnMouseButtonPressed(FakeDeviceId, MouseButton.Middle);
 
             listener.ButtonPressed += (_, _) => Assert.Fail();
             provider.DispatchEvents();
-            Assert.That(listener.ConnectedDevices, Is.Empty);
+            Assert.That(listener.ConnectedDevices, Is.EquivalentTo(baselineDevices));
         }
 
         [Test, Category(MouseCategory)]
@@ -296,10 +361,20 @@ namespace Logos.Input.Tests
         {
             SdlInputProvider provider = new SdlInputProvider();
             IKeyboardListener listener = provider.GetListener<IKeyboardListener>();
+            IKeyboardDevice[] baselineDevices = listener.ConnectedDevices.ToArray();
+            IKeyboardDevice? connectedKeyboard = null;
             EventQueueMarshal.OnKeyboardConnected(FakeDeviceId);
 
+            listener.DeviceConnected += (_, args) =>
+            {
+                if (args.Device is IKeyboardDevice device && !baselineDevices.Contains(device))
+                {
+                    connectedKeyboard = device;
+                }
+            };
+
             provider.DispatchEvents();
-            keyboard = listener.ConnectedDevices.FirstOrDefault()!;
+            keyboard = connectedKeyboard!;
 
             if (keyboard == null)
             {
@@ -313,10 +388,20 @@ namespace Logos.Input.Tests
         {
             SdlInputProvider provider = new SdlInputProvider();
             IMouseListener listener = provider.GetListener<IMouseListener>();
+            IMouseDevice[] baselineDevices = listener.ConnectedDevices.ToArray();
+            IMouseDevice? connectedMouse = null;
             EventQueueMarshal.OnMouseConnected(FakeDeviceId);
 
+            listener.DeviceConnected += (_, args) =>
+            {
+                if (args.Device is IMouseDevice device && !baselineDevices.Contains(device))
+                {
+                    connectedMouse = device;
+                }
+            };
+
             provider.DispatchEvents();
-            mouse = listener.ConnectedDevices.FirstOrDefault()!;
+            mouse = connectedMouse!;
 
             if (mouse == null)
             {
