@@ -19,12 +19,12 @@ namespace Logos.Input
         /// <param name="timestamp">
         /// The time at which the event occured.
         /// </param>
-        /// <param name="translation">
+        /// <param name="velocity">
         /// The change in the position of <paramref name="device"/> that triggered the event.
         /// </param>
-        public MouseMotionEventArgs(IMouseDevice device, TimeSpan timestamp, Vector2 translation) : base(device, timestamp)
+        public MouseMotionEventArgs(IMouseDevice device, TimeSpan timestamp, Vector2 velocity) : base(device, timestamp)
         {
-            Translation = translation;
+            Velocity = velocity;
         }
 
         /// <summary>
@@ -44,6 +44,6 @@ namespace Logos.Input
         /// <returns>
         /// The change in the position of <see cref="Device"/> that triggered the event.
         /// </returns>
-        public Vector2 Translation { get; }
+        public Vector2 Velocity { get; }
     }
 }

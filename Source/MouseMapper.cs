@@ -230,7 +230,7 @@ namespace Logos.Input
                 observer.OnMouseMoved(sender, args);
             }
 
-            MouseMotionDirection direction = (MouseMotionDirection)GetDirection(args.Translation);
+            MouseMotionDirection direction = (MouseMotionDirection)GetDirection(args.Velocity);
 
             if (direction != 0 && _motionBindings.TryGetValue(direction, out observer))
             {
@@ -253,24 +253,24 @@ namespace Logos.Input
             }
         }
 
-        private static int GetDirection(Vector2 direction)
+        private static int GetDirection(Vector2 vector)
         {
             int flags = 0;
 
-            if (direction.Y > 0.0f)
+            if (vector.Y > 0.0f)
             {
                 flags |= UpDirectionFlag;
             }
-            else if (direction.Y < 0.0f)
+            else if (vector.Y < 0.0f)
             {
                 flags |= DownDirectionFlag;
             }
 
-            if (direction.X > 0.0f)
+            if (vector.X > 0.0f)
             {
                 flags |= LeftDirectionFlag;
             }
-            else if (direction.X < 0.0f)
+            else if (vector.X < 0.0f)
             {
                 flags |= RightDirectionFlag;
             }

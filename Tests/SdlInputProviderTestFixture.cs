@@ -288,7 +288,7 @@ namespace Logos.Input.Tests
             {
                 Assert.That(cursorMovedArgs, Is.Not.Null);
                 Assert.That(cursorMovedArgs.Device, Is.SameAs(mouse));
-                Assert.That(cursorMovedArgs.Translation, Is.EqualTo(position));
+                Assert.That(cursorMovedArgs.Velocity, Is.EqualTo(position));
                 Assert.That(mouse.Position, Is.EqualTo(position));
             }
         }
