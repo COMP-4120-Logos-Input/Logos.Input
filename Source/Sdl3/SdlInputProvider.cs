@@ -11,7 +11,7 @@ namespace Logos.Input.Sdl3
         private readonly ObservableKeyboardDeviceCollection _keyboards;
         private readonly ObservableMouseDeviceCollection _mice;
         private readonly Dictionary<uint, SdlWindow> _windows;
-        
+
         public void RegisterWindow(SdlWindow window) => _windows[window.Id] = window;
         public void UnregisterWindow(SdlWindow window) => _windows.Remove(window.Id);
 
@@ -29,7 +29,7 @@ namespace Logos.Input.Sdl3
             _keyboards = new ObservableKeyboardDeviceCollection();
             _mice = new ObservableMouseDeviceCollection();
             _windows = new Dictionary<uint, SdlWindow>();
-            
+
             nint keyboardIds = SDL_GetKeyboards(out int keyboardCount);
             for (int i = 0; i < keyboardCount; i++)
             {
@@ -38,7 +38,7 @@ namespace Logos.Input.Sdl3
                 _keyboards.Add(id, device);
             }
             SDL_free(keyboardIds);
-            
+
             nint mouseIds = SDL_GetMice(out int mouseCount);
             for (int i = 0; i < mouseCount; i++)
             {
@@ -68,7 +68,7 @@ namespace Logos.Input.Sdl3
             SDL_Quit();
 
         }
-        
+
         public T GetListener<T>() where T : IInputListener
         {
             if (_keyboards is T keyboardListener)
@@ -132,8 +132,8 @@ namespace Logos.Input.Sdl3
         }
 
 
-        
-        private static TimeSpan ToTimeSpan(ulong timestamp)
+
+        private static TimeSpan GetTimeSpan(ulong timestamp)
         {
             return new TimeSpan((long)(timestamp / TimeSpan.NanosecondsPerTick));
         }
@@ -279,12 +279,12 @@ namespace Logos.Input.Sdl3
 
             private static InputEventArgs CreateEventArgs(KeyboardDevice device, ref readonly SDL_KeyboardDeviceEvent e)
             {
-                return new InputEventArgs(device, ToTimeSpan(e.timestamp));
+                return new InputEventArgs(device, GetTimeSpan(e.timestamp));
             }
 
             private static KeyEventArgs CreateEventArgs(KeyboardDevice device, ref readonly SDL_KeyboardEvent e)
             {
-                return new KeyEventArgs(device, ToTimeSpan(e.timestamp), (KeyCode)e.scancode);
+                return new KeyEventArgs(device, GetTimeSpan(e.timestamp), (KeyCode)e.scancode);
             }
         }
 
@@ -301,15 +301,15 @@ namespace Logos.Input.Sdl3
             }
 
             public event EventHandler<InputEventArgs>? DeviceConnected;
-            
+
             public event EventHandler<InputEventArgs>? DeviceDisconnected;
 
             public event EventHandler<MouseButtonEventArgs>? ButtonPressed;
-            
+
             public event EventHandler<MouseButtonEventArgs>? ButtonReleased;
-            
+
             public event EventHandler<MouseMotionEventArgs>? MouseMoved;
-            
+
             public event EventHandler<MouseWheelEventArgs>? WheelMoved;
 
             public void OnMouseAdded(ref readonly SDL_MouseDeviceEvent e)
@@ -337,7 +337,7 @@ namespace Logos.Input.Sdl3
                 if (TryGetValue(e.which, out MouseDevice? mouse))
                 {
                     mouse.OnMouseButtonDown(in e);
-                    ButtonPressed?.Invoke(this, CreateEventArgs(mouse, in e));     
+                    ButtonPressed?.Invoke(this, CreateEventArgs(mouse, in e));
                 }
             }
 
@@ -346,7 +346,7 @@ namespace Logos.Input.Sdl3
                 if (TryGetValue(e.which, out MouseDevice? mouse))
                 {
                     mouse.OnMouseButtonUp(in e);
-                    ButtonReleased?.Invoke(this, CreateEventArgs(mouse, in e));                    
+                    ButtonReleased?.Invoke(this, CreateEventArgs(mouse, in e));
                 }
 
             }
@@ -373,22 +373,22 @@ namespace Logos.Input.Sdl3
 
             private static InputEventArgs CreateEventArgs(MouseDevice device, ref readonly SDL_MouseDeviceEvent e)
             {
-                return new InputEventArgs(device, ToTimeSpan(e.timestamp));
+                return new InputEventArgs(device, GetTimeSpan(e.timestamp));
             }
 
             private static MouseButtonEventArgs CreateEventArgs(MouseDevice device, ref readonly SDL_MouseButtonEvent e)
             {
-                return new MouseButtonEventArgs(device, ToTimeSpan(e.timestamp), (MouseButton)e.button);
+                return new MouseButtonEventArgs(device, GetTimeSpan(e.timestamp), (MouseButton)e.button);
             }
 
             private static MouseMotionEventArgs CreateEventArgs(MouseDevice device, ref readonly SDL_MouseMotionEvent e)
             {
-                return new MouseMotionEventArgs(device, ToTimeSpan(e.timestamp), new Vector2(e.x, e.y));
+                return new MouseMotionEventArgs(device, GetTimeSpan(e.timestamp), new Vector2(e.x, e.y));
             }
 
             private static MouseWheelEventArgs CreateEventArgs(MouseDevice device, ref readonly SDL_MouseWheelEvent e)
             {
-                return new MouseWheelEventArgs(device, ToTimeSpan(e.timestamp), new Vector2(e.x, e.y));
+                return new MouseWheelEventArgs(device, GetTimeSpan(e.timestamp), new Vector2(e.x, e.y));
             }
         }
     }
