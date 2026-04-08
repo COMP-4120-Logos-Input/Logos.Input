@@ -27,7 +27,7 @@ namespace Logos.Input.Tests
             Assume.That(HasVendoredNativeSdl(), Is.True, "Requires a vendored native SDL3 binary for this platform.");
 
             SdlInputProvider provider = new SdlInputProvider();
-            IKeyboardListener listener = provider.GetListener<IKeyboardListener>();
+            IKeyboardListener listener = provider.GetListener<IKeyboardListener>()!;
             bool connected = false;
 
             listener.DeviceConnected += (_, _) => connected = true;

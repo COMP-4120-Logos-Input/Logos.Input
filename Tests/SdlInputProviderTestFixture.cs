@@ -28,7 +28,7 @@ namespace Logos.Input.Tests
         public void Update_WhenKeyboardConnected_RaisesDeviceConnectedAndTracksDevice()
         {
             SdlInputProvider provider = new SdlInputProvider();
-            IKeyboardListener listener = provider.GetListener<IKeyboardListener>();
+            IKeyboardListener listener = provider.GetListener<IKeyboardListener>()!;
             IKeyboardDevice[] baselineDevices = listener.ConnectedDevices.ToArray();
             EventQueueMarshal.OnKeyboardAdded(FakeDeviceId);
             InputEventArgs? deviceConnectedArgs = null;
@@ -57,7 +57,7 @@ namespace Logos.Input.Tests
         public void Update_WhenKeyboardDisconnected_RaisesDeviceDisconnectedAndRemovesDevice()
         {
             SdlInputProvider provider = new SdlInputProvider();
-            IKeyboardListener listener = provider.GetListener<IKeyboardListener>();
+            IKeyboardListener listener = provider.GetListener<IKeyboardListener>()!;
             IKeyboardDevice[] baselineDevices = listener.ConnectedDevices.ToArray();
             EventQueueMarshal.OnKeyboardAdded(FakeDeviceId);
             EventQueueMarshal.OnKeyboardRemoved(FakeDeviceId);
@@ -91,7 +91,7 @@ namespace Logos.Input.Tests
         public void Update_WhenKnownKeyboardReceivesKeyPressed_RaisesKeyboardAndProviderEvents()
         {
             SdlInputProvider provider = SetUpFakeKeyboard(out IKeyboardDevice keyboard);
-            IKeyboardListener listener = provider.GetListener<IKeyboardListener>();
+            IKeyboardListener listener = provider.GetListener<IKeyboardListener>()!;
             EventQueueMarshal.OnKeyDown(FakeDeviceId, KeyCode.A, isRepeat: true);
             KeyEventArgs? keyPressedArgs = null;
 
@@ -117,7 +117,7 @@ namespace Logos.Input.Tests
         public void Update_WhenKnownKeyboardReceivesKeyReleased_RaisesKeyboardAndProviderEvents()
         {
             SdlInputProvider provider = SetUpFakeKeyboard(out IKeyboardDevice keyboard);
-            IKeyboardListener listener = provider.GetListener<IKeyboardListener>();
+            IKeyboardListener listener = provider.GetListener<IKeyboardListener>()!;
             EventQueueMarshal.OnKeyDown(FakeDeviceId, KeyCode.B, isRepeat: false);
             EventQueueMarshal.OnKeyUp(FakeDeviceId, KeyCode.B);
             KeyEventArgs? keyReleasedArgs = null;
@@ -144,7 +144,7 @@ namespace Logos.Input.Tests
         public void Update_WhenUnknownKeyboardReceivesKeyEvent_DoesNotRaiseDeviceUpdated()
         {
             SdlInputProvider provider = new SdlInputProvider();
-            IKeyboardListener listener = provider.GetListener<IKeyboardListener>();
+            IKeyboardListener listener = provider.GetListener<IKeyboardListener>()!;
             IKeyboardDevice[] baselineDevices = listener.ConnectedDevices.ToArray();
             EventQueueMarshal.OnKeyDown(FakeDeviceId, KeyCode.C, isRepeat: false);
 
@@ -157,7 +157,7 @@ namespace Logos.Input.Tests
         public void Update_WhenMouseConnected_RaisesDeviceConnectedAndTracksDevice()
         {
             SdlInputProvider provider = new SdlInputProvider();
-            IMouseListener listener = provider.GetListener<IMouseListener>();
+            IMouseListener listener = provider.GetListener<IMouseListener>()!;
             IMouseDevice[] baselineDevices = listener.ConnectedDevices.ToArray();
             EventQueueMarshal.OnMouseAdded(FakeDeviceId);
             InputEventArgs? deviceConnectedArgs = null;
@@ -186,7 +186,7 @@ namespace Logos.Input.Tests
         public void Update_WhenMouseDisconnected_RaisesDeviceDisconnectedAndRemovesDevice()
         {
             SdlInputProvider provider = new SdlInputProvider();
-            IMouseListener listener = provider.GetListener<IMouseListener>();
+            IMouseListener listener = provider.GetListener<IMouseListener>()!;
             IMouseDevice[] baselineDevices = listener.ConnectedDevices.ToArray();
             EventQueueMarshal.OnMouseAdded(FakeDeviceId);
             EventQueueMarshal.OnMouseRemoved(FakeDeviceId);
@@ -220,7 +220,7 @@ namespace Logos.Input.Tests
         public void Update_WhenKnownMouseReceivesButtonPressed_RaisesMouseAndProviderEvents()
         {
             SdlInputProvider provider = SetUpFakeMouse(out IMouseDevice mouse);
-            IMouseListener listener = provider.GetListener<IMouseListener>();
+            IMouseListener listener = provider.GetListener<IMouseListener>()!;
             EventQueueMarshal.OnMouseButtonDown(FakeDeviceId, MouseButton.Left);
             MouseButtonEventArgs? buttonPressedArgs = null;
 
@@ -245,7 +245,7 @@ namespace Logos.Input.Tests
         public void Update_WhenKnownMouseReceivesButtonReleased_RaisesMouseAndProviderEvents()
         {
             SdlInputProvider provider = SetUpFakeMouse(out IMouseDevice mouse);
-            IMouseListener listener = provider.GetListener<IMouseListener>();
+            IMouseListener listener = provider.GetListener<IMouseListener>()!;
             EventQueueMarshal.OnMouseButtonDown(FakeDeviceId, MouseButton.Right);
             EventQueueMarshal.OnMouseButtonUp(FakeDeviceId, MouseButton.Right);
             MouseButtonEventArgs? buttonReleasedArgs = null;
@@ -271,7 +271,7 @@ namespace Logos.Input.Tests
         public void Update_WhenKnownMouseReceivesCursorMoved_RaisesMouseAndProviderEvents()
         {
             SdlInputProvider provider = SetUpFakeMouse(out IMouseDevice mouse);
-            IMouseListener listener = provider.GetListener<IMouseListener>();
+            IMouseListener listener = provider.GetListener<IMouseListener>()!;
             Vector2 velocity = new Vector2(123.5f, 456.25f);
             EventQueueMarshal.OnMouseMotion(FakeDeviceId, velocity.X, velocity.Y, velocity.X, velocity.Y);
             MouseMotionEventArgs? cursorMovedArgs = null;
@@ -292,7 +292,7 @@ namespace Logos.Input.Tests
         public void Update_WhenKnownMouseReceivesWheelRolled_RaisesMouseAndProviderEvents()
         {
             SdlInputProvider provider = SetUpFakeMouse(out IMouseDevice mouse);
-            IMouseListener listener = provider.GetListener<IMouseListener>();
+            IMouseListener listener = provider.GetListener<IMouseListener>()!;
             Vector2 rotation = new Vector2(-2.0f, 1.5f);
             EventQueueMarshal.OnMouseWheel(FakeDeviceId, rotation.X, rotation.Y);
             MouseWheelEventArgs? wheelRolledArgs = null;
@@ -319,7 +319,7 @@ namespace Logos.Input.Tests
         public void Update_WhenUnknownMouseReceivesButtonEvent_DoesNotRaiseDeviceUpdated()
         {
             SdlInputProvider provider = new SdlInputProvider();
-            IMouseListener listener = provider.GetListener<IMouseListener>();
+            IMouseListener listener = provider.GetListener<IMouseListener>()!;
             IMouseDevice[] baselineDevices = listener.ConnectedDevices.ToArray();
             EventQueueMarshal.OnMouseButtonDown(FakeDeviceId, MouseButton.Middle);
 
@@ -355,7 +355,7 @@ namespace Logos.Input.Tests
         private static SdlInputProvider SetUpFakeKeyboard(out IKeyboardDevice keyboard)
         {
             SdlInputProvider provider = new SdlInputProvider();
-            IKeyboardListener listener = provider.GetListener<IKeyboardListener>();
+            IKeyboardListener listener = provider.GetListener<IKeyboardListener>()!;
             IKeyboardDevice[] baselineDevices = listener.ConnectedDevices.ToArray();
             IKeyboardDevice? connectedKeyboard = null;
             EventQueueMarshal.OnKeyboardAdded(FakeDeviceId);
@@ -382,7 +382,7 @@ namespace Logos.Input.Tests
         private static SdlInputProvider SetUpFakeMouse(out IMouseDevice mouse)
         {
             SdlInputProvider provider = new SdlInputProvider();
-            IMouseListener listener = provider.GetListener<IMouseListener>();
+            IMouseListener listener = provider.GetListener<IMouseListener>()!;
             IMouseDevice[] baselineDevices = listener.ConnectedDevices.ToArray();
             IMouseDevice? connectedMouse = null;
             EventQueueMarshal.OnMouseAdded(FakeDeviceId);

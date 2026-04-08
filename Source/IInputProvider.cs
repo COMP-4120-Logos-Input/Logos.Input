@@ -25,13 +25,9 @@ namespace Logos.Input
         /// </typeparam>
         /// <returns>
         /// An input listener of type <typeparamref name="T"/> that exposes events for a specific
-        /// kind of input device.
+        /// kind of input device, if one exists; otherwise, <see langword="null"/>.
         /// </returns>
-        /// <exception cref="NotSupportedException">
-        /// The <see cref="IInputProvider"/> does not contain an input listener of type
-        /// <typeparamref name="T"/>.
-        /// </exception>
-        T GetListener<T>() where T : IInputListener;
+        T? GetListener<T>() where T : IInputListener;
 
         /// <summary>
         /// Processes data from connected input devices and dispatches their emitted events.

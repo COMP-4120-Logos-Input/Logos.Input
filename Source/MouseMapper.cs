@@ -134,15 +134,13 @@ namespace Logos.Input
         /// <see cref="MouseMapper"/>.
         /// </param>
         /// <exception cref="ArgumentNullException">
-        /// <paramref name="provider"/> is <see langword="null"/>.
-        /// </exception>
-        /// <exception cref="NotSupportedException">
+        /// <paramref name="provider"/> is <see langword="null"/>. -or-
         /// <paramref name="provider"/> does not contain a mouse listener.
         /// </exception>
         public void RouteEvents(IInputProvider provider)
         {
             ArgumentNullException.ThrowIfNull(provider);
-            RouteEvents(provider.GetListener<IMouseListener>());
+            RouteEvents(provider.GetListener<IMouseListener>()!);
         }
 
         /// <summary>
@@ -172,15 +170,13 @@ namespace Logos.Input
         /// reaching the <see cref="MouseMapper"/>.
         /// </param>
         /// <exception cref="ArgumentNullException">
-        /// <paramref name="provider"/> is <see langword="null"/>.
-        /// </exception>
-        /// <exception cref="NotSupportedException">
+        /// <paramref name="provider"/> is <see langword="null"/>. -or-
         /// <paramref name="provider"/> does not contain a mouse listener.
         /// </exception>
         public void BlockEvents(IInputProvider provider)
         {
             ArgumentNullException.ThrowIfNull(provider);
-            BlockEvents(provider.GetListener<IMouseListener>());
+            BlockEvents(provider.GetListener<IMouseListener>()!);
         }
 
         /// <summary>

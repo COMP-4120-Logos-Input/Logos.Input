@@ -73,7 +73,7 @@ namespace Logos.Input.Sdl3
 
         }
 
-        public T GetListener<T>() where T : IInputListener
+        public T? GetListener<T>() where T : IInputListener
         {
             if (typeof(T) == typeof(IKeyboardListener))
             {
@@ -85,8 +85,7 @@ namespace Logos.Input.Sdl3
                 return (T)(IInputListener)_mice;
             }
 
-            throw new NotSupportedException(
-                "The SdlInputProvider does not contain the specified input listener.");
+            return default;
         }
 
         public void DispatchEvents()

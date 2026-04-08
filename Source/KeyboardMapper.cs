@@ -60,15 +60,13 @@ namespace Logos.Input
         /// <see cref="KeyboardMapper"/>.
         /// </param>
         /// <exception cref="ArgumentNullException">
-        /// <paramref name="provider"/> is <see langword="null"/>.
-        /// </exception>
-        /// <exception cref="NotSupportedException">
+        /// <paramref name="provider"/> is <see langword="null"/>. -or-
         /// <paramref name="provider"/> does not contain a keyboard listener.
         /// </exception>
         public void RouteEvents(IInputProvider provider)
         {
             ArgumentNullException.ThrowIfNull(provider);
-            RouteEvents(provider.GetListener<IKeyboardListener>());
+            RouteEvents(provider.GetListener<IKeyboardListener>()!);
         }
 
         /// <summary>
@@ -98,15 +96,13 @@ namespace Logos.Input
         /// reaching the <see cref="KeyboardMapper"/>.
         /// </param>
         /// <exception cref="ArgumentNullException">
-        /// <paramref name="provider"/> is <see langword="null"/>.
-        /// </exception>
-        /// <exception cref="NotSupportedException">
+        /// <paramref name="provider"/> is <see langword="null"/>. -or-
         /// <paramref name="provider"/> does not contain a keyboard listener.
         /// </exception>
         public void BlockEvents(IInputProvider provider)
         {
             ArgumentNullException.ThrowIfNull(provider);
-            BlockEvents(provider.GetListener<IKeyboardListener>());
+            BlockEvents(provider.GetListener<IKeyboardListener>()!);
         }
 
         /// <summary>
