@@ -75,14 +75,14 @@ namespace Logos.Input.Sdl3
 
         public T GetListener<T>() where T : IInputListener
         {
-            if (_keyboards is T keyboardListener)
+            if (typeof(T) == typeof(IKeyboardListener))
             {
-                return keyboardListener;
+                return (T)(IInputListener)_keyboards;
             }
 
-            if (_mice is T mouseListener)
+            if (typeof(T) == typeof(IMouseListener))
             {
-                return mouseListener;
+                return (T)(IInputListener)_mice;
             }
 
             throw new NotSupportedException(
