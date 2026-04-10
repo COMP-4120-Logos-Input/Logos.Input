@@ -10,15 +10,15 @@ namespace Logos.Input.Tests
         [Test, Category(MouseCategory)]
         public void BindButtonPress_triggers_handler_on_button_press()
         {
-            var mapper = new MouseMapper();
-            var device = new FakeMouseListener();
+            var listener = new FakeMouseListener();
+            var mapper = new MouseMapper(listener);
             var control = new MouseButtonControlSpy();
 
             mapper.Bind(new MouseButtonGesture(MouseButton.Left, MouseButtonAction.Press), control);
-            mapper.RouteEvents(device);
+            mapper.IsEnabled = true;
 
             var input = new MouseButtonEventArgs(null!, TimeSpan.FromTicks(7), MouseButton.Left);
-            device.RaiseButtonPressed(input);
+            listener.RaiseButtonPressed(input);
 
             using (Assert.EnterMultipleScope())
             {
@@ -30,15 +30,15 @@ namespace Logos.Input.Tests
         [Test, Category(MouseCategory)]
         public void BindButtonRelease_triggers_handler_on_button_release()
         {
-            var mapper = new MouseMapper();
-            var device = new FakeMouseListener();
+            var listener = new FakeMouseListener();
+            var mapper = new MouseMapper(listener);
             var control = new MouseButtonControlSpy();
 
             mapper.Bind(new MouseButtonGesture(MouseButton.Right, MouseButtonAction.Release), control);
-            mapper.RouteEvents(device);
+            mapper.IsEnabled = true;
 
             var input = new MouseButtonEventArgs(null!, TimeSpan.FromTicks(13), MouseButton.Right);
-            device.RaiseButtonReleased(input);
+            listener.RaiseButtonReleased(input);
 
             using (Assert.EnterMultipleScope())
             {
@@ -50,15 +50,15 @@ namespace Logos.Input.Tests
         [Test, Category(MouseCategory)]
         public void BindCursorMotion_triggers_handler_on_cursor_move()
         {
-            var mapper = new MouseMapper();
-            var device = new FakeMouseListener();
+            var listener = new FakeMouseListener();
+            var mapper = new MouseMapper(listener);
             var control = new MouseMotionControlSpy();
 
             mapper.Bind(MouseMotionDirection.Any, control);
-            mapper.RouteEvents(device);
+            mapper.IsEnabled = true;
 
             var input = new MouseMotionEventArgs(null!, TimeSpan.FromTicks(21), new Vector2(10.0f, 20.0f));
-            device.RaiseMouseMoved(input);
+            listener.RaiseMouseMoved(input);
 
             using (Assert.EnterMultipleScope())
             {
@@ -70,15 +70,15 @@ namespace Logos.Input.Tests
         [Test, Category(MouseCategory)]
         public void BindWheelRotation_triggers_handler_on_wheel_roll()
         {
-            var mapper = new MouseMapper();
-            var device = new FakeMouseListener();
+            var listener = new FakeMouseListener();
+            var mapper = new MouseMapper(listener);
             var control = new MouseWheelControlSpy();
 
             mapper.Bind(MouseWheelDirection.Any, control);
-            mapper.RouteEvents(device);
+            mapper.IsEnabled = true;
 
             var input = new MouseWheelEventArgs(null!, TimeSpan.FromTicks(31), new Vector2(1.0f, -1.0f));
-            device.RaiseWheelMoved(input);
+            listener.RaiseWheelMoved(input);
 
             using (Assert.EnterMultipleScope())
             {
@@ -90,15 +90,15 @@ namespace Logos.Input.Tests
         [Test, Category(MouseCategory)]
         public void UnbindCursorMotion_stops_receiving_cursor_events()
         {
-            var mapper = new MouseMapper();
-            var device = new FakeMouseListener();
+            var listener = new FakeMouseListener();
+            var mapper = new MouseMapper(listener);
             var control = new MouseMotionControlSpy();
 
             mapper.Bind(MouseMotionDirection.Any, control);
-            mapper.RouteEvents(device);
-            mapper.BlockEvents(device);
+            mapper.IsEnabled = true;
+            mapper.IsEnabled = false;
 
-            device.RaiseMouseMoved(new MouseMotionEventArgs(null!, TimeSpan.FromTicks(2), new Vector2(5.0f, 6.0f)));
+            listener.RaiseMouseMoved(new MouseMotionEventArgs(null!, TimeSpan.FromTicks(2), new Vector2(5.0f, 6.0f)));
 
             Assert.That(control.WasTriggered, Is.False);
         }

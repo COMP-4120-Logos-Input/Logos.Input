@@ -9,15 +9,15 @@ namespace Logos.Input.Tests
         [Test, Category(KeyboardCategory)]
         public void BindKeyPress_triggers_handler_on_repeat_key_event()
         {
-            var mapper = new KeyboardMapper();
-            var device = new FakeKeyboardListener();
+            var listener = new FakeKeyboardListener();
+            var mapper = new KeyboardMapper(listener);
             var control = new KeyControlSpy();
 
             mapper.Bind(new KeyGesture(KeyCode.A, KeyAction.Press), control);
-            mapper.RouteEvents(device);
+            mapper.IsEnabled = true;
 
             var input = new KeyEventArgs(null!, TimeSpan.FromTicks(42), KeyCode.A);
-            device.RaiseKeyPressed(input);
+            listener.RaiseKeyPressed(input);
 
             using (Assert.EnterMultipleScope())
             {
@@ -29,15 +29,15 @@ namespace Logos.Input.Tests
         [Test, Category(KeyboardCategory)]
         public void BindKeyRepeat_triggers_handler_on_non_repeat_key_event()
         {
-            var mapper = new KeyboardMapper();
-            var device = new FakeKeyboardListener();
+            var listener = new FakeKeyboardListener();
+            var mapper = new KeyboardMapper(listener);
             var control = new KeyControlSpy();
 
             mapper.Bind(new KeyGesture(KeyCode.B, KeyAction.Repeat), control);
-            mapper.RouteEvents(device);
+            mapper.IsEnabled = true;
 
             var input = new KeyEventArgs(null!, TimeSpan.FromTicks(99), KeyCode.B);
-            device.RaiseKeyRepeated(input);
+            listener.RaiseKeyRepeated(input);
 
             using (Assert.EnterMultipleScope())
             {
@@ -49,15 +49,15 @@ namespace Logos.Input.Tests
         [Test, Category(KeyboardCategory)]
         public void BindKeyRelease_triggers_handler_on_key_release_event()
         {
-            var mapper = new KeyboardMapper();
-            var device = new FakeKeyboardListener();
+            var listener = new FakeKeyboardListener();
+            var mapper = new KeyboardMapper(listener);
             var control = new KeyControlSpy();
 
             mapper.Bind(new KeyGesture(KeyCode.C, KeyAction.Release), control);
-            mapper.RouteEvents(device);
+            mapper.IsEnabled = true;
 
             var input = new KeyEventArgs(null!, TimeSpan.FromTicks(123), KeyCode.C);
-            device.RaiseKeyReleased(input);
+            listener.RaiseKeyReleased(input);
 
             using (Assert.EnterMultipleScope())
             {
@@ -69,15 +69,15 @@ namespace Logos.Input.Tests
         [Test, Category(KeyboardCategory)]
         public void Disconnect_stops_receiving_key_events()
         {
-            var mapper = new KeyboardMapper();
-            var device = new FakeKeyboardListener();
+            var listener = new FakeKeyboardListener();
+            var mapper = new KeyboardMapper(listener);
             var control = new KeyControlSpy();
 
             mapper.Bind(new KeyGesture(KeyCode.D, KeyAction.Press), control);
-            mapper.RouteEvents(device);
-            mapper.BlockEvents(device);
+            mapper.IsEnabled = true;
+            mapper.IsEnabled = false;
 
-            device.RaiseKeyPressed(new KeyEventArgs(null!, TimeSpan.FromTicks(1), KeyCode.D));
+            listener.RaiseKeyPressed(new KeyEventArgs(null!, TimeSpan.FromTicks(1), KeyCode.D));
 
             Assert.That(control.WasTriggered, Is.False);
         }

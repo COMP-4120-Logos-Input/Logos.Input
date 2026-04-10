@@ -4,20 +4,114 @@ using System.Collections.Generic;
 namespace Logos.Input
 {
     /// <summary>
-    /// Represents an input mapper that routes input events triggered by specific key gestures to
-    /// mapped key observers.
+    /// Represents an event router that notifies key observers of events triggered by mapped key
+    /// gestures.
     /// </summary>
     public class KeyboardMapper : IInputMapper
     {
+        private readonly IKeyboardListener _listener;
         private readonly Dictionary<KeyGesture, IKeyObserver> _bindings;
+        private bool _isEnabled;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="KeyboardMapper"/> class.
+        /// Initializes a new instance of the <see cref="KeyboardMapper"/> class that routes events
+        /// sent by the specified keyboard listener to key observers when enabled.
         /// </summary>
-        public KeyboardMapper()
+        /// <param name="listener">
+        /// The keyboard listener whose events are to be routed.
+        /// </param>
+        /// <exception cref="ArgumentNullException">
+        /// <paramref name="listener"/> is <see langword="null"/>.
+        /// </exception>
+        public KeyboardMapper(IKeyboardListener listener)
         {
+            ArgumentNullException.ThrowIfNull(listener);
+            _listener =  listener;
             _bindings = new Dictionary<KeyGesture, IKeyObserver>();
         }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="KeyboardMapper"/> class that routes events
+        /// sent by the specified keyboard listener to key observers when enabled.
+        /// </summary>
+        /// <param name="listener">
+        /// The keyboard listener whose events are to be routed.
+        /// </param>
+        /// <param name="isEnabled">
+        /// Enables event routing if <see langword="true"/>; otherwise, disables event routing.
+        /// </param>
+        /// <exception cref="ArgumentNullException">
+        /// <paramref name="listener"/> is <see langword="null"/>.
+        /// </exception>
+        public KeyboardMapper(IKeyboardListener listener, bool isEnabled)
+        {
+            ArgumentNullException.ThrowIfNull(listener);
+
+            if (isEnabled)
+            {
+                listener.KeyPressed += OnKeyPressed;
+                listener.KeyRepeated += OnKeyRepeated;
+                listener.KeyReleased += OnKeyReleased;
+            }
+
+            _listener =  listener;
+            _isEnabled = isEnabled;
+            _bindings = new Dictionary<KeyGesture, IKeyObserver>();
+        }
+
+        /// <summary>
+        /// Gets the keyboard listener whose events are to be routed.
+        /// </summary>
+        /// <returns>
+        /// The keyboard listener whose events are to be routed.
+        /// </returns>
+        public IKeyboardListener Listener
+        {
+            get => _listener;
+        }
+
+        /// <summary>
+        /// Gets or sets a value that indicates whether the <see cref="KeyboardMapper"/> is routing
+        /// events to mapped key observers.
+        /// </summary>
+        /// <param name="value">
+        /// Enables event routing if <see langword="true"/>; otherwise, disables event routing.
+        /// </param>
+        /// <returns>
+        /// <see langword="true"/> if event routing is enabled; otherwise, <see langword="false"/>.
+        /// </returns>
+        public bool IsEnabled
+        {
+            get => _isEnabled;
+            set
+            {
+                if (_isEnabled == value)
+                {
+                    return;
+                }
+
+                if (value)
+                {
+                    _listener.KeyPressed += OnKeyPressed;
+                    _listener.KeyRepeated += OnKeyRepeated;
+                    _listener.KeyReleased += OnKeyReleased;
+                }
+                else
+                {
+                    _listener.KeyPressed -= OnKeyPressed;
+                    _listener.KeyRepeated -= OnKeyRepeated;
+                    _listener.KeyReleased -= OnKeyReleased;
+                }
+
+                _isEnabled = value;
+                EnabledChanged?.Invoke(this, value);
+            }
+        }
+
+        /// <summary>
+        /// Occurs when the <see cref="KeyboardMapper"/> is enabled or disabled.
+        /// </summary>
+        public event EventHandler<bool>? EnabledChanged;
 
         /// <summary>
         /// Routes input events triggered by the specified key gesture to the specified key
@@ -49,79 +143,6 @@ namespace Logos.Input
         public void Unbind(KeyGesture gesture)
         {
             _bindings.Remove(gesture);
-        }
-
-        /// <summary>
-        /// Routes events exposed by a keyboard listener from the specified input provider to the
-        /// <see cref="KeyboardMapper"/>.
-        /// </summary>
-        /// <param name="provider">
-        /// The input provider containing a keyboard listener whose events are to be routed to the
-        /// <see cref="KeyboardMapper"/>.
-        /// </param>
-        /// <exception cref="ArgumentNullException">
-        /// <paramref name="provider"/> is <see langword="null"/>. -or-
-        /// <paramref name="provider"/> does not contain a keyboard listener.
-        /// </exception>
-        public void RouteEvents(IInputProvider provider)
-        {
-            ArgumentNullException.ThrowIfNull(provider);
-            RouteEvents(provider.GetListener<IKeyboardListener>()!);
-        }
-
-        /// <summary>
-        /// Routes events exposed by the specified keyboard listener to the
-        /// <see cref="KeyboardMapper"/>.
-        /// </summary>
-        /// <param name="listener">
-        /// The keyboard listener whose events are to be routed to the <see cref="KeyboardMapper"/>.
-        /// </param>
-        /// <exception cref="ArgumentNullException">
-        /// <paramref name="listener"/> is <see langword="null"/>.
-        /// </exception>
-        public void RouteEvents(IKeyboardListener listener)
-        {
-            ArgumentNullException.ThrowIfNull(listener);
-            listener.KeyPressed += OnKeyPressed;
-            listener.KeyRepeated += OnKeyRepeated;
-            listener.KeyReleased += OnKeyReleased;
-        }
-
-        /// <summary>
-        /// Blocks events exposed by a keyboard listener from the specified input provider from
-        /// reaching the <see cref="KeyboardMapper"/>.
-        /// </summary>
-        /// <param name="provider">
-        /// The input provider containing a keyboard listener whose events are to be blocked from
-        /// reaching the <see cref="KeyboardMapper"/>.
-        /// </param>
-        /// <exception cref="ArgumentNullException">
-        /// <paramref name="provider"/> is <see langword="null"/>. -or-
-        /// <paramref name="provider"/> does not contain a keyboard listener.
-        /// </exception>
-        public void BlockEvents(IInputProvider provider)
-        {
-            ArgumentNullException.ThrowIfNull(provider);
-            BlockEvents(provider.GetListener<IKeyboardListener>()!);
-        }
-
-        /// <summary>
-        /// Blocks events exposed by the specified keyboard listener from reaching the
-        /// <see cref="KeyboardMapper"/>.
-        /// </summary>
-        /// <param name="listener">
-        /// The keyboard listener whose events are to be blocked from reaching the
-        /// <see cref="KeyboardMapper"/>.
-        /// </param>
-        /// <exception cref="ArgumentNullException">
-        /// <paramref name="listener"/> is <see langword="null"/>.
-        /// </exception>
-        public void BlockEvents(IKeyboardListener listener)
-        {
-            ArgumentNullException.ThrowIfNull(listener);
-            listener.KeyPressed -= OnKeyPressed;
-            listener.KeyRepeated -= OnKeyRepeated;
-            listener.KeyReleased -= OnKeyReleased;
         }
 
         private void OnKeyPressed(object? sender, KeyEventArgs args)

@@ -5,8 +5,8 @@ using System.Numerics;
 namespace Logos.Input
 {
     /// <summary>
-    /// Represents an input mapper that routes input events triggered by specific mouse gestures to
-    /// mapped mouse observers.
+    /// Represents an event router that notifies mouse observers of events triggered by mapped mouse
+    /// gestures.
     /// </summary>
     public class MouseMapper : IInputMapper
     {
@@ -15,19 +15,118 @@ namespace Logos.Input
         private const int LeftDirectionFlag = 1 << 2;
         private const int RightDirectionFlag = 1 << 3;
 
+        private readonly IMouseListener _listener;
         private readonly Dictionary<MouseButtonGesture, IMouseButtonObserver> _buttonBindings;
         private readonly Dictionary<MouseMotionDirection, IMouseMotionObserver> _motionBindings;
         private readonly Dictionary<MouseWheelDirection, IMouseWheelObserver> _wheelBindings;
+        private bool _isEnabled;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="MouseMapper"/> class.
+        /// Initializes a new instance of the <see cref="MouseMapper"/> class that routes events
+        /// sent by the specified mouse listener to key observers when enabled.
         /// </summary>
-        public MouseMapper()
+        /// <param name="listener">
+        /// The mouse listener whose events are to be routed.
+        /// </param>
+        /// <exception cref="ArgumentNullException">
+        /// <paramref name="listener"/> is <see langword="null"/>.
+        /// </exception>
+        public MouseMapper(IMouseListener listener)
         {
+            ArgumentNullException.ThrowIfNull(listener);
+            _listener =  listener;
             _buttonBindings = new Dictionary<MouseButtonGesture, IMouseButtonObserver>();
             _motionBindings = new Dictionary<MouseMotionDirection, IMouseMotionObserver>();
             _wheelBindings = new Dictionary<MouseWheelDirection, IMouseWheelObserver>();
         }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="MouseMapper"/> class that routes events
+        /// sent by the specified mouse listener to key observers when enabled.
+        /// </summary>
+        /// <param name="listener">
+        /// The mouse listener whose events are to be routed.
+        /// </param>
+        /// <param name="isEnabled">
+        /// Enables event routing if <see langword="true"/>; otherwise, disables event routing.
+        /// </param>
+        /// <exception cref="ArgumentNullException">
+        /// <paramref name="listener"/> is <see langword="null"/>.
+        /// </exception>
+        public MouseMapper(IMouseListener listener, bool isEnabled)
+        {
+            ArgumentNullException.ThrowIfNull(listener);
+
+            if (isEnabled)
+            {
+                listener.ButtonPressed += OnButtonPressed;
+                listener.ButtonReleased += OnButtonReleased;
+                listener.MouseMoved += OnMouseMoved;
+                listener.WheelMoved += OnWheelMoved;
+            }
+
+            _listener =  listener;
+            _isEnabled = isEnabled;
+            _buttonBindings = new Dictionary<MouseButtonGesture, IMouseButtonObserver>();
+            _motionBindings = new Dictionary<MouseMotionDirection, IMouseMotionObserver>();
+            _wheelBindings = new Dictionary<MouseWheelDirection, IMouseWheelObserver>();
+        }
+
+        /// <summary>
+        /// Gets the mouse listener whose events are to be routed.
+        /// </summary>
+        /// <returns>
+        /// The mouse listener whose events are to be routed.
+        /// </returns>
+        public IMouseListener Listener
+        {
+            get => _listener;
+        }
+
+        /// <summary>
+        /// Gets or sets a value that indicates whether the <see cref="MouseMapper"/> is routing
+        /// events to mapped mouse observers.
+        /// </summary>
+        /// <param name="value">
+        /// Enables event routing if <see langword="true"/>; otherwise, disables event routing.
+        /// </param>
+        /// <returns>
+        /// <see langword="true"/> if event routing is enabled; otherwise, <see langword="false"/>.
+        /// </returns>
+        public bool IsEnabled
+        {
+            get => _isEnabled;
+            set
+            {
+                if (_isEnabled == value)
+                {
+                    return;
+                }
+
+                if (value)
+                {
+                    _listener.ButtonPressed += OnButtonPressed;
+                    _listener.ButtonReleased += OnButtonReleased;
+                    _listener.MouseMoved += OnMouseMoved;
+                    _listener.WheelMoved += OnWheelMoved;
+                }
+                else
+                {
+                    _listener.ButtonPressed -= OnButtonPressed;
+                    _listener.ButtonReleased -= OnButtonReleased;
+                    _listener.MouseMoved -= OnMouseMoved;
+                    _listener.WheelMoved -= OnWheelMoved;
+                }
+
+                _isEnabled = value;
+                EnabledChanged?.Invoke(this, value);
+            }
+        }
+
+        /// <summary>
+        /// Occurs when the <see cref="MouseMapper"/> is enabled or disabled.
+        /// </summary>
+        public event EventHandler<bool>? EnabledChanged;
 
         /// <summary>
         /// Routes input events triggered by the specified mouse button gesture to the specified
@@ -123,80 +222,6 @@ namespace Logos.Input
         public void Unbind(MouseWheelDirection direction)
         {
             _wheelBindings.Remove(direction);
-        }
-
-        /// <summary>
-        /// Routes events exposed by a mouse listener from the specified input provider to the
-        /// <see cref="MouseMapper"/>.
-        /// </summary>
-        /// <param name="provider">
-        /// The input provider containing a mouse listener whose events are to be routed to the
-        /// <see cref="MouseMapper"/>.
-        /// </param>
-        /// <exception cref="ArgumentNullException">
-        /// <paramref name="provider"/> is <see langword="null"/>. -or-
-        /// <paramref name="provider"/> does not contain a mouse listener.
-        /// </exception>
-        public void RouteEvents(IInputProvider provider)
-        {
-            ArgumentNullException.ThrowIfNull(provider);
-            RouteEvents(provider.GetListener<IMouseListener>()!);
-        }
-
-        /// <summary>
-        /// Routes events exposed by the specified mouse listener to the <see cref="MouseMapper"/>.
-        /// </summary>
-        /// <param name="listener">
-        /// The mouse listener whose events are to be routed to the <see cref="MouseMapper"/>.
-        /// </param>
-        /// <exception cref="ArgumentNullException">
-        /// <paramref name="listener"/> is <see langword="null"/>.
-        /// </exception>
-        public void RouteEvents(IMouseListener listener)
-        {
-            ArgumentNullException.ThrowIfNull(listener);
-            listener.ButtonPressed += OnButtonPressed;
-            listener.ButtonReleased += OnButtonReleased;
-            listener.MouseMoved += OnMouseMoved;
-            listener.WheelMoved += OnWheelMoved;
-        }
-
-        /// <summary>
-        /// Blocks events exposed by a mouse listener from the specified input provider from
-        /// reaching the <see cref="MouseMapper"/>.
-        /// </summary>
-        /// <param name="provider">
-        /// The input provider containing a mouse listener whose events are to be blocked from
-        /// reaching the <see cref="MouseMapper"/>.
-        /// </param>
-        /// <exception cref="ArgumentNullException">
-        /// <paramref name="provider"/> is <see langword="null"/>. -or-
-        /// <paramref name="provider"/> does not contain a mouse listener.
-        /// </exception>
-        public void BlockEvents(IInputProvider provider)
-        {
-            ArgumentNullException.ThrowIfNull(provider);
-            BlockEvents(provider.GetListener<IMouseListener>()!);
-        }
-
-        /// <summary>
-        /// Blocks events exposed by the specified mouse listener from reaching the
-        /// <see cref="MouseMapper"/>.
-        /// </summary>
-        /// <param name="listener">
-        /// The mouse listener whose events are to be blocked from reaching the
-        /// <see cref="MouseMapper"/>.
-        /// </param>
-        /// <exception cref="ArgumentNullException">
-        /// <paramref name="listener"/> is <see langword="null"/>.
-        /// </exception>
-        public void BlockEvents(IMouseListener listener)
-        {
-            ArgumentNullException.ThrowIfNull(listener);
-            listener.ButtonPressed -= OnButtonPressed;
-            listener.ButtonReleased -= OnButtonReleased;
-            listener.MouseMoved -= OnMouseMoved;
-            listener.WheelMoved -= OnWheelMoved;
         }
 
         private void OnButtonPressed(object? sender, MouseButtonEventArgs args)

@@ -3,40 +3,26 @@
 namespace Logos.Input
 {
     /// <summary>
-    /// Represents an event router that notifies input observers based on mapped input gestures.
+    /// Represents an event router that notifies input observers of events triggered by mapped input
+    /// gestures.
     /// </summary>
     public interface IInputMapper
     {
         /// <summary>
-        /// Routes events exposed by compatible input listeners from the specified input provider to
-        /// the <see cref="IInputMapper"/>.
+        /// Gets or sets a value that indicates whether the <see cref="IInputMapper"/> is routing
+        /// events to mapped input observers.
         /// </summary>
-        /// <param name="provider">
-        /// The input provider containing input listeners whose events are to be routed to the
-        /// <see cref="IInputMapper"/>.
+        /// <param name="value">
+        /// Enables event routing if <see langword="true"/>; otherwise, disables event routing.
         /// </param>
-        /// <exception cref="ArgumentNullException">
-        /// <paramref name="provider"/> is <see langword="null"/>.
-        /// </exception>
-        /// <exception cref="NotSupportedException">
-        /// <paramref name="provider"/> does not contain a required input listener.
-        /// </exception>
-        void RouteEvents(IInputProvider provider);
+        /// <returns>
+        /// <see langword="true"/> if event routing is enabled; otherwise, <see langword="false"/>.
+        /// </returns>
+        bool IsEnabled { get; set; }
 
         /// <summary>
-        /// Blocks events exposed by compatible input listeners from the specified input provider
-        /// from reaching the <see cref="IInputMapper"/>.
+        /// Occurs when the <see cref="IInputMapper"/> is enabled or disabled.
         /// </summary>
-        /// <param name="provider">
-        /// The input provider containing input listeners whose events are to be blocked from
-        /// reaching the <see cref="IInputMapper"/>.
-        /// </param>
-        /// <exception cref="ArgumentNullException">
-        /// <paramref name="provider"/> is <see langword="null"/>.
-        /// </exception>
-        /// <exception cref="NotSupportedException">
-        /// <paramref name="provider"/> does not contain a required input listener.
-        /// </exception>
-        void BlockEvents(IInputProvider provider);
+        event EventHandler<bool>? EnabledChanged;
     }
 }
