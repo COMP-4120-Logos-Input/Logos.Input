@@ -106,12 +106,12 @@ namespace Logos.Input.Tests
 #pragma warning disable CS0067
         private sealed class FakeMouseListener : IMouseListener
         {
-            public IEnumerable<IMouseDevice> ConnectedDevices
+            public IEnumerable<IMouseDevice> Devices
             {
                 get => null!;
             }
 
-            IEnumerable<IInputDevice> IInputListener.ConnectedDevices
+            IEnumerable<IInputDevice> IInputListener.Devices
             {
                 get => null!;
             }

@@ -29,13 +29,13 @@ namespace Logos.Input.Tests
         {
             SdlInputProvider provider = new SdlInputProvider();
             IKeyboardListener listener = provider.GetListener<IKeyboardListener>()!;
-            IKeyboardDevice[] baselineDevices = listener.ConnectedDevices.ToArray();
+            IKeyboardDevice[] baselineDevices = listener.Devices.ToArray();
             EventQueueMarshal.OnKeyboardAdded(FakeDeviceId);
             InputEventArgs? deviceConnectedArgs = null;
 
             listener.DeviceConnected += (_, args) => deviceConnectedArgs = args;
             provider.DispatchEvents();
-            IKeyboardDevice[] connectedDevices = listener.ConnectedDevices.ToArray();
+            IKeyboardDevice[] connectedDevices = listener.Devices.ToArray();
 
             if (deviceConnectedArgs is null)
             {
@@ -58,7 +58,7 @@ namespace Logos.Input.Tests
         {
             SdlInputProvider provider = new SdlInputProvider();
             IKeyboardListener listener = provider.GetListener<IKeyboardListener>()!;
-            IKeyboardDevice[] baselineDevices = listener.ConnectedDevices.ToArray();
+            IKeyboardDevice[] baselineDevices = listener.Devices.ToArray();
             EventQueueMarshal.OnKeyboardAdded(FakeDeviceId);
             EventQueueMarshal.OnKeyboardRemoved(FakeDeviceId);
             InputEventArgs? deviceConnectedArgs = null;
@@ -67,7 +67,7 @@ namespace Logos.Input.Tests
             listener.DeviceConnected += (_, args) => deviceConnectedArgs = args;
             listener.DeviceDisconnected += (_, args) => deviceDisconnectedArgs = args;
             provider.DispatchEvents();
-            IKeyboardDevice[] connectedDevices = listener.ConnectedDevices.ToArray();
+            IKeyboardDevice[] connectedDevices = listener.Devices.ToArray();
 
             if (deviceConnectedArgs is null || deviceDisconnectedArgs is null)
             {
@@ -145,12 +145,12 @@ namespace Logos.Input.Tests
         {
             SdlInputProvider provider = new SdlInputProvider();
             IKeyboardListener listener = provider.GetListener<IKeyboardListener>()!;
-            IKeyboardDevice[] baselineDevices = listener.ConnectedDevices.ToArray();
+            IKeyboardDevice[] baselineDevices = listener.Devices.ToArray();
             EventQueueMarshal.OnKeyDown(FakeDeviceId, KeyCode.C, isRepeat: false);
 
             listener.KeyPressed += (_, _) => Assert.Fail();
             provider.DispatchEvents();
-            Assert.That(listener.ConnectedDevices, Is.EquivalentTo(baselineDevices));
+            Assert.That(listener.Devices, Is.EquivalentTo(baselineDevices));
         }
 
         [Test, Category(MouseCategory)]
@@ -158,13 +158,13 @@ namespace Logos.Input.Tests
         {
             SdlInputProvider provider = new SdlInputProvider();
             IMouseListener listener = provider.GetListener<IMouseListener>()!;
-            IMouseDevice[] baselineDevices = listener.ConnectedDevices.ToArray();
+            IMouseDevice[] baselineDevices = listener.Devices.ToArray();
             EventQueueMarshal.OnMouseAdded(FakeDeviceId);
             InputEventArgs? deviceConnectedArgs = null;
 
             listener.DeviceConnected += (_, args) => deviceConnectedArgs = args;
             provider.DispatchEvents();
-            IMouseDevice[] connectedDevices = listener.ConnectedDevices.ToArray();
+            IMouseDevice[] connectedDevices = listener.Devices.ToArray();
 
             if (deviceConnectedArgs is null)
             {
@@ -187,7 +187,7 @@ namespace Logos.Input.Tests
         {
             SdlInputProvider provider = new SdlInputProvider();
             IMouseListener listener = provider.GetListener<IMouseListener>()!;
-            IMouseDevice[] baselineDevices = listener.ConnectedDevices.ToArray();
+            IMouseDevice[] baselineDevices = listener.Devices.ToArray();
             EventQueueMarshal.OnMouseAdded(FakeDeviceId);
             EventQueueMarshal.OnMouseRemoved(FakeDeviceId);
             InputEventArgs? deviceConnectedArgs = null;
@@ -196,7 +196,7 @@ namespace Logos.Input.Tests
             listener.DeviceConnected += (_, args) => deviceConnectedArgs = args;
             listener.DeviceDisconnected += (_, args) => deviceDisconnectedArgs = args;
             provider.DispatchEvents();
-            IMouseDevice[] connectedDevices = listener.ConnectedDevices.ToArray();
+            IMouseDevice[] connectedDevices = listener.Devices.ToArray();
 
             if (deviceConnectedArgs is null || deviceDisconnectedArgs is null)
             {
@@ -320,12 +320,12 @@ namespace Logos.Input.Tests
         {
             SdlInputProvider provider = new SdlInputProvider();
             IMouseListener listener = provider.GetListener<IMouseListener>()!;
-            IMouseDevice[] baselineDevices = listener.ConnectedDevices.ToArray();
+            IMouseDevice[] baselineDevices = listener.Devices.ToArray();
             EventQueueMarshal.OnMouseButtonDown(FakeDeviceId, MouseButton.Middle);
 
             listener.ButtonPressed += (_, _) => Assert.Fail();
             provider.DispatchEvents();
-            Assert.That(listener.ConnectedDevices, Is.EquivalentTo(baselineDevices));
+            Assert.That(listener.Devices, Is.EquivalentTo(baselineDevices));
         }
 
         [Test, Category(MouseCategory)]
@@ -356,7 +356,7 @@ namespace Logos.Input.Tests
         {
             SdlInputProvider provider = new SdlInputProvider();
             IKeyboardListener listener = provider.GetListener<IKeyboardListener>()!;
-            IKeyboardDevice[] baselineDevices = listener.ConnectedDevices.ToArray();
+            IKeyboardDevice[] baselineDevices = listener.Devices.ToArray();
             IKeyboardDevice? connectedKeyboard = null;
             EventQueueMarshal.OnKeyboardAdded(FakeDeviceId);
 
@@ -383,7 +383,7 @@ namespace Logos.Input.Tests
         {
             SdlInputProvider provider = new SdlInputProvider();
             IMouseListener listener = provider.GetListener<IMouseListener>()!;
-            IMouseDevice[] baselineDevices = listener.ConnectedDevices.ToArray();
+            IMouseDevice[] baselineDevices = listener.Devices.ToArray();
             IMouseDevice? connectedMouse = null;
             EventQueueMarshal.OnMouseAdded(FakeDeviceId);
 

@@ -15,7 +15,7 @@ namespace Logos.Input
         /// <returns>
         /// A collection of keyboard devices that are currently connected.
         /// </returns>
-        new IEnumerable<IKeyboardDevice> ConnectedDevices { get; }
+        new IEnumerable<IKeyboardDevice> Devices { get; }
 
         /// <summary>
         /// Occurs when a key is pressed on a keyboard device.

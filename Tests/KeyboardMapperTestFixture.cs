@@ -85,12 +85,12 @@ namespace Logos.Input.Tests
 #pragma warning disable CS0067
         private sealed class FakeKeyboardListener : IKeyboardListener
         {
-            public IEnumerable<IKeyboardDevice> ConnectedDevices
+            public IEnumerable<IKeyboardDevice> Devices
             {
                 get => null!;
             }
 
-            IEnumerable<IInputDevice> IInputListener.ConnectedDevices
+            IEnumerable<IInputDevice> IInputListener.Devices
             {
                 get => null!;
             }

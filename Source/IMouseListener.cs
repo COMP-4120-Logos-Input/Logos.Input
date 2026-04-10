@@ -15,7 +15,7 @@ namespace Logos.Input
         /// <returns>
         /// A collection of mouse devices that are currently connected.
         /// </returns>
-        new IEnumerable<IMouseDevice> ConnectedDevices { get; }
+        new IEnumerable<IMouseDevice> Devices { get; }
 
         /// <summary>
         /// Occurs when a button has been pressed on a mouse device.

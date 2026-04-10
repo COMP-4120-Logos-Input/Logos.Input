@@ -9,7 +9,7 @@ provider.RegisterWindow(window);
 var keyboard = provider.GetListener<IKeyboardListener>();
 var mouse    = provider.GetListener<IMouseListener>();
 
-foreach (var keyboardDevice in mouse.ConnectedDevices)
+foreach (var keyboardDevice in mouse.Devices)
 {
     Console.WriteLine("Connected Device: " + keyboardDevice);
 }

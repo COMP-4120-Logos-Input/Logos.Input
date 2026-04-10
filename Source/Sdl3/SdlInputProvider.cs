@@ -223,12 +223,12 @@ namespace Logos.Input.Sdl3
             {
             }
 
-            public IEnumerable<IKeyboardDevice> ConnectedDevices
+            public IEnumerable<IKeyboardDevice> Devices
             {
                 get => Values;
             }
 
-            IEnumerable<IInputDevice> IInputListener.ConnectedDevices
+            IEnumerable<IInputDevice> IInputListener.Devices
             {
                 get => Values;
             }
@@ -299,12 +299,12 @@ namespace Logos.Input.Sdl3
             {
             }
 
-            public IEnumerable<IMouseDevice> ConnectedDevices
+            public IEnumerable<IMouseDevice> Devices
             {
                 get => Values;
             }
 
-            IEnumerable<IInputDevice> IInputListener.ConnectedDevices
+            IEnumerable<IInputDevice> IInputListener.Devices
             {
                 get => Values;
             }
