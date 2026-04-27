@@ -83,3 +83,13 @@ $ python Scripts/results.py
 * **Libraries:** Stores precompiled native libraries that Logos.Input depends on, but cannot be built using C# build tools.
 * **Source:** Stores implementation of input processing components provided by Logos.Input, including extensions for SDL3.
 * **Tests:** Stores unit tests that verify the functionality of input processing components provided by Logos.Input.
+
+## Logos.Input in Action
+
+We have assembled a few tutorials integrating our library with the Godot Engine and the GLFW input library which can be viewed in the GitHub repositories below:
+
+### Godot Integration
+https://github.com/COMP-4120-Logos-Input/Godot-Demo
+
+### GLFW 
+https://github.com/COMP-4120-Logos-Input/GLFW-Demo
