@@ -91,5 +91,5 @@ We have assembled a few tutorials integrating our library with the Godot Engine 
 ### Godot Integration
 https://github.com/COMP-4120-Logos-Input/Godot-Demo
 
-### GLFW 
+### GLFW Integration
 https://github.com/COMP-4120-Logos-Input/GLFW-Demo
